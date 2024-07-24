@@ -1,9 +1,6 @@
-<?php
-session_start();
-?>
 <header>
     <div>
-        <a href="trangchu.php"><img src="../img/logo/logo.png" alt="Ảnh logo"></a>
+        <a href="trangchu.php"><img src="../img/logo/anhnen_trangchu.jpg" alt="Ảnh logo"></a>
     </div>
     <div>
         <form>
@@ -39,7 +36,6 @@ session_start();
                         </ul>
                     <?php } else { ?>
                         <ul>
-                            <li><a href="#">Giỏ hàng</a></li>
                             <li><a href="#">Thông tin tài khoản</a></li>
                             <li><a href="api.php?action=logout">Đăng xuất</a></li>
                         </ul><?php
@@ -50,14 +46,27 @@ session_start();
                 ?>
             </div>
         </li>
-        <li>
-            <div>
-                <i class="fa fa-cart-shopping"></i>
-            </div>
-            <div>
-                <div id="giohang"><span>Giỏ hàng (0)</span></div>
-                <div id="tiengiohong">0đ</div>
-            </div>
+        <li id="giohang_canhan">
+            <?php
+            if (!isset($_SESSION['taikhoan'])) {
+                ?>
+                <div>
+                    <i class="fa fa-cart-shopping"></i>
+                </div>
+                <div>
+                    <div id="giohang"><span>Giỏ hàng (0)</span></div>
+                    <div id="tiengiohong">0đ</div>
+                <?php } else { ?>
+                    <?php if ($_SESSION['loai'] == 1) { ?>
+                        <div>
+                            <i class="fa fa-cart-shopping"></i>
+                        </div>
+                        <div>
+                            <div id="giohang"><span>Giỏ hàng(<?php echo $_SESSION['quantity_product'] ?>)</span></div>
+                            <div id="tiengiohong"><?php echo number_format($_SESSION['totalAmount'], 0, '', ',')."đ" ?></div>
+                        <?php } ?>
+                    <?php } ?>
+                </div>
         </li>
     </div>
 </header>

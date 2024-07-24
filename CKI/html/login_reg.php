@@ -21,7 +21,7 @@
             <h6>Content</h6>
         </div>
         <div id="form_login">
-            <form id="login">
+            <form id="login" autocomplete="off">
                 <h5>ĐĂNG NHẬP</h5>
                 <p id="tbao_login"></p>
                 <div style="margin-top: 0">
@@ -47,7 +47,7 @@
             </form>
         </div>
         <div id="form_reg">
-            <form id="reg">
+            <form id="reg" autocomplete="off">
                 <h5>ĐĂNG KÝ</h5>
                 <p id="tbao_reg"></p>
                 <div style="margin-top: 0">

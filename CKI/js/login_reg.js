@@ -2,8 +2,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var btn_login = document.getElementById('btn_login');
     var btn_reg = document.getElementById('btn_reg');
 
-    var form_login = document.getElementById('form_login');
-    var form_reg = document.getElementById('form_reg');
+    var div_login = document.getElementById('form_login');
+    var div_reg = document.getElementById('form_reg');
 
     var inputs = document.querySelectorAll('#form_login input, #form_reg input');
     var labels = document.querySelectorAll('#form_login label, #form_reg label');
@@ -11,14 +11,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     //Click vào đăng ký
     btn_reg.addEventListener('click', function () {
-        form_login.classList.add('change_pos');
-        form_reg.classList.add('change_pos');
+        div_login.classList.add('change_pos');
+        div_reg.classList.add('change_pos');
     })
 
     //Click vào đăng nhập
     btn_login.addEventListener('click', function () {
-        form_login.classList.remove('change_pos');
-        form_reg.classList.remove('change_pos');
+        div_login.classList.remove('change_pos');
+        div_reg.classList.remove('change_pos');
     })
 
 
@@ -37,17 +37,15 @@ document.addEventListener('DOMContentLoaded', function () {
                                 buttons[j].style.display = 'block';
                             }
                         }
-                        var buttonIndex = -1;
                         for (var j = 0; j < buttons.length; j++) {
                             if (buttons[j].id === buttonID) {
-                                buttonIndex = j;
                                 for (var k = 0; k < inputs.length; k++) {
                                     if (j == 0) {
                                         inputs[1].type = 'text';
-                                    } else if (j == 4) {
-                                        inputs[3].type = 'text';
-                                    } else if (j == 6) {
-                                        inputs[4].type = 'text';
+                                    } else if (j == 3) {
+                                        inputs[5].type = 'text';
+                                    } else if (j == 5) {
+                                        inputs[6].type = 'text';
                                     }
                                 }
                             }
@@ -69,14 +67,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     var buttonIndex = -1;
                     for (var j = 0; j < buttons.length; j++) {
                         if (buttons[j].className === buttonClass) {
-                            buttonIndex = j;
                             for (var k = 0; k < inputs.length; k++) {
                                 if (j == 1) {
                                     inputs[1].type = 'password';
-                                } else if (j == 5) {
-                                    inputs[3].type = 'password';
-                                } else if (j == 7) {
-                                    inputs[4].type = 'password';
+                                } else if (j == 4) {
+                                    inputs[5].type = 'password';
+                                } else if (j == 6) {
+                                    inputs[6].type = 'password';
                                 }
                             }
                         }
@@ -122,6 +119,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var form_login = document.getElementById('login');
     var form_reg = document.getElementById('reg');
 
+    //form login
     form_login.addEventListener('submit', function (e) {
         e.preventDefault();
 
@@ -136,11 +134,39 @@ document.addEventListener('DOMContentLoaded', function () {
             success: function (res) {
                 if (res == "Không") {
                     $("#tbao_login").html("Tài khoản hoặc mật khẩu sai");
-                }else{
+                } else {
                     window.location.href = '../html/trangchu.php'
                 }
             }
         })
+    })
+
+    //form reg
+    form_reg.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        if (!inputs[2].value || !inputs[3].value || !inputs[4].value || !inputs[5].value || !inputs[6].value) {
+            $("#tbao_reg").html("Hãy nhập đầy đủ thông tin");
+        } else {
+            if (inputs[5].value != inputs[6].value) {
+                $("#tbao_reg").html("Mật khẩu nhập lại sai");
+            } else {
+                $.ajax({
+                    url: 'api.php?action=reg',
+                    method: 'post',
+                    data: { inputHo: inputs[2].value, inputTen: inputs[3].value, inputAcc: inputs[4].value, inputPas: inputs[5].value },
+                    success: function (res) {
+                        if (res == "Không") {
+                            $("#tbao_reg").html("Tài khoản hoặc mật khẩu đã tồn tại");
+                        } else if(res == "ok") {
+                            window.location.href = '../html/trangchu.php'
+                        }else{
+                            $("#tbao_reg").html(res);
+                        }
+                    }
+                })
+            }
+        }
     })
 
 })

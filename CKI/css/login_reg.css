@@ -203,15 +203,16 @@ body {
 
 .btn_showhidden_login,
 .btn_showhidden_reg,
-.btn_showhidden_again_reg{
+.btn_showhidden_again_reg {
     display: none;
 }
 
-#form_login > div:first-child{
+#form_login>div:first-child {
     margin: 0;
 }
 
-#tbao_login{
+#tbao_login,
+#tbao_reg {
     font-size: 2.3vh;
     color: red;
     width: 80%;
