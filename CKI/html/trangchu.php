@@ -75,15 +75,18 @@ session_start();
         <div id="books_sph"></div>
     </div>
 
+    <!-- Số lượng member, product -->
     <div class="container_img_members_books">
         <img src="http://file.hstatic.net/1000266609/file/bgparallax-04.jpg" alt="">
         <div class="container_members_books">
             <div class="container_members">
                 <div>
-                    <i class="fa fa-users"></i>
+                    <i class="fa fa-user"></i>
                 </div>
                 <div>
-                    <div>Thành viên</div>
+                    <div>
+                        <p>Thành Viên</p>
+                    </div>
                     <div>
                         <p>
                             <?php
@@ -102,7 +105,9 @@ session_start();
                     <i class="fa fa-book"></i>
                 </div>
                 <div>
-                    <div>Sản phẩm</div>
+                    <div>
+                        <p>Sản Phẩm</p>
+                    </div>
                     <div>
                         <p>
                             <?php
@@ -116,6 +121,85 @@ session_start();
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Đối tác vận chuyển -->
+    <div class="container_dtvc">
+        <div>
+            <h2>Đối tác vận chuyển</h2>
+            <img src="../img/logo/header_title.png" alt="">
+            <div class="intro_dtvc">
+                <div>
+                    <div class="intro_img_dtvc"><img src="../img/logo/logo_vnp.webp" alt=""></div>
+                    <div class="content_dtvc">
+                        <p>Giao hàng đến 63 tỉnh thành trên toàn quốc. Đối tác vận chuyển chính của shop Tổng công ty
+                            Bưu điện Việt Nam được hình thành trên cơ sở triển khai Đề án thí điểm hình thành Tập đoàn
+                            Bưu chính Viễn thông Việt Nam (Tập đoàn VNPT) do Thủ tướng Chính phủ phê duyệt tại Quyết
+                            định số 58/2005/QĐ-TTg ngày 23/3/2005.</p>
+                        <span>VNPOST</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="intro_img_dtvc"><img src="../img/logo/logo_grab.webp" alt=""></div>
+                    <div class="content_dtvc">
+                        <p>Giao hàng trong ngày tại Tp Hồ Chí Minh. Đối tác vận chuyển tin cậy của shop. Công ty TNHH
+                            Grab. Địa chỉ: Thành phố Hồ Chí Minh, Việt Nam.</p>
+                        <span>GRAB</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="intro_img_dtvc"><img src="../img/logo/logo_ghn.webp" alt=""></div>
+                    <div class="content_dtvc">
+                        <p>Công ty giao nhận đầu tiên tại Việt Nam được thành lập với sứ mệnh phục vụ nhu cầu vận chuyển
+                            chuyên nghiệp của các đối tác Thương mại điện tử trên toàn quốc.</p>
+                        <span>GIAO HÀNG NHANH</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Châm ngôn -->
+    <div class="container_maxim">
+        <div>
+            <i class="fa fa-rocket"></i>
+            <h4>GIAO HÀNG TẬN NƠI</h4>
+            <p>Dù Bạn Ở Bất Cứ Nơi Đâu</p>
+        </div>
+        <div>
+            <i class="fa fa-tag"></i>
+            <h4>PHỤC VỤ TẬN TÌNH</h4>
+            <p>Niềm Vui Của Bạn Là Hạnh Phúc Của Chúng Tôi</p>
+        </div>
+        <div>
+            <i class="fa-brands fa-envira"></i>
+            <h4>SẢN PHẨM CHẤT LƯỢNG</h4>
+            <p>Hàng Hóa Chính Hãng 100%</p>
+        </div>
+        <div>
+            <i class="fa fa-heart"></i>
+            <h4>BÁN HÀNG VÌ ĐAM MÊ</h4>
+            <p>Bán Hàng Bằng Cả Trái Tim</p>
+        </div>
+    </div>
+
+    <!-- Các nhà xuất bản -->
+    <div class="container_slide">
+        <div class="image">
+            <img src="../img/logo/amak.webp" alt="">
+        </div>
+        <div class="image">
+            <img src="../img/logo/hikari.webp" alt="">
+        </div>
+        <div class="image">
+            <img src="../img/logo/kimdong.webp" alt="">
+        </div>
+        <div class="image">
+            <img src="../img/logo/nhanam.webp" alt="">
+        </div>
+        <div class="image">
+            <img src="../img/logo/nxbtre.webp" alt="">
         </div>
     </div>
 

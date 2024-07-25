@@ -74,7 +74,7 @@ html {
     flex-direction: column;
     align-items: center;
     padding: 5% 0;
-    box-shadow: 0px 1px 2px rgb(187, 187, 187);
+    box-shadow: 0px 2px 5px rgb(187, 187, 187);
 }
 
 .container_newbook>div:first-child {
@@ -199,8 +199,11 @@ html {
 
 .container_img_members_books {
     width: 100%;
-    height: 15pc;
+    height: 13.5pc;
     overflow: hidden;
+    position: relative;
+    margin-bottom: 5%;
+    /* box-shadow: 0px 2px 5px rgb(187, 187, 187); */
 }
 
 .container_img_members_books img {
@@ -208,12 +211,15 @@ html {
     height: 100%;
     object-position: 50% 0%;
     object-fit: cover;
+    position: absolute;
+    filter: brightness(0.95);
 }
 
 .container_members_books {
     width: 100%;
     height: 100%;
     display: flex;
+    position: absolute;
 }
 
 .container_members,
@@ -223,4 +229,164 @@ html {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.container_members>div:first-child,
+.container_quantity_books>div:first-child {
+    padding: 4% 5%;
+    border-radius: 50%;
+}
+
+.container_members>div:first-child {
+    background-color: #93648d;
+}
+
+.container_quantity_books>div:first-child {
+    background-color: #4cc3d9;
+}
+
+.container_members>div:first-child i,
+.container_quantity_books>div:first-child i {
+    font-size: 1.7pc;
+    color: whitesmoke;
+}
+
+.container_members>div:last-child,
+.container_quantity_books>div:last-child {
+    margin-left: 7%;
+}
+
+.container_members>div:last-child div:first-child p,
+.container_quantity_books>div:last-child div:first-child p {
+    font-size: 4vh;
+    font-weight: 500;
+}
+
+.container_members>div:last-child div:first-child p {
+    color: #93648d;
+}
+
+.container_quantity_books>div:last-child div:first-child p {
+    color: #4cc3d9;
+}
+
+.container_members>div:last-child div:last-child p,
+.container_quantity_books>div:last-child div:last-child p {
+    font-size: 3.5vh;
+    text-align: center;
+}
+
+.container_dtvc {
+    width: 100%;
+    height: 25pc;
+    margin-bottom: 15%;
+}
+
+.container_dtvc>div:first-child {
+    text-align: center;
+}
+
+.container_dtvc div h2 {
+    letter-spacing: .2em;
+    margin: 2% 0;
+    text-transform: uppercase;
+}
+
+.container_dtvc .intro_dtvc {
+    display: flex;
+    width: 100%;
+}
+
+.intro_dtvc>div {
+    width: 33%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 3%;
+}
+
+.content_dtvc {
+    background-color: whitesmoke;
+    padding-bottom: 7%;
+}
+
+.content_dtvc p {
+    text-align: justify;
+    padding: 2%;
+    font-size: 16px;
+    color: #333;
+    min-height: 15pc;
+    line-height: 1.8em;
+}
+
+.intro_img_dtvc img {
+    width: 170px;
+    height: 170px;
+}
+
+.content_dtvc span {
+    color: #c83548;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.container_maxim {
+    width: 100%;
+    height: 15pc;
+    display: flex;
+    background-color: whitesmoke;
+}
+
+.container_maxim div {
+    width: 25%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.container_maxim div i,
+.container_maxim div h4,
+.container_maxim div p {
+    margin: 2% 0;
+    text-align: center;
+}
+
+.container_maxim div i {
+    font-size: 5vh;
+}
+
+.container_maxim div:first-child i {
+    color: #93648d;
+}
+
+.container_maxim div:nth-of-type(2) i {
+    color: #4cc3d9;
+}
+
+.container_maxim div:nth-of-type(3) i {
+    color: #7bc8a4;
+}
+
+.container_maxim div:last-child i {
+    color: #f16745;
+}
+
+.container_maxim div h4 {
+    font-size: 22px;
+    font-weight: 500;
+}
+
+.container_maxim div p {
+    font-size: 2.8vh;
+    color: #333;
+}
+
+/* Anh NXB */
+.container_slide {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
 }
