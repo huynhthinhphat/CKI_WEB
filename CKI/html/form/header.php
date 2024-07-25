@@ -71,7 +71,7 @@
     </div>
 </header>
 <nav>
-    <li><a href="#">Danh mục</a></li>
+    <li><a href="danhmuc.php">Danh mục</a></li>
     <li><a href="#">Danh mục</a></li>
     <li><a href="#">Danh mục</a></li>
     <li><a href="#">Danh mục</a></li>
