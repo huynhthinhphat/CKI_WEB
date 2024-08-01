@@ -1,7 +1,7 @@
-<footer>
+<footer id="footer">
     <div>
         <div>
-            <div class="footer-img"><img src="../img/logo/logo_footer.png" alt=""></div>
+            <div class="footer-img"><img src="/project/LTWEB/CKI/img/logo/logo_footer.png" alt=""></div>
             <div class="footer-website">WEBSITE THUỘC QUYỀN</div>
         </div>
         <div class="footer-name-company">

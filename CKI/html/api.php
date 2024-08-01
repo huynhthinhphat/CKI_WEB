@@ -22,9 +22,22 @@ $inputPas = isset($_POST['inputPas']) ? $_POST['inputPas'] : '';
 $inputHo = isset($_POST['inputHo']) ? $_POST['inputHo'] : '';
 $inputTen = isset($_POST['inputTen']) ? $_POST['inputTen'] : '';
 
-//biến limit xem thêm dữ liệu
-$limit_iw = isset($_POST['limit_iw']) ? $_POST['limit_iw'] : 5;
-$limit_sph = isset($_POST['limit_sph']) ? $_POST['limit_sph'] : 5;
+//biến tìm kiếm từ khóa trong doanh thu
+$input_search = isset($_POST['input_search']) ? $_POST['input_search'] : '';
+$date_from = isset($_POST['date_from']) ? $_POST['date_from'] : '';
+$date_to = isset($_POST['date_to']) ? $_POST['date_to'] : '';
+
+//trang được chọn
+$pageChoose = isset($_POST['pageChoose']) ? $_POST['pageChoose'] : '';
+$pageChoose_iw = isset($_POST['pageChoose_iw']) ? $_POST['pageChoose_iw'] : '';
+$pageChoose_sph = isset($_POST['pageChoose_sph']) ? $_POST['pageChoose_sph'] : '';
+
+//biến thông tin chuyển trạng thái
+$pbiet = isset($_POST['pbiet']) ? $_POST['pbiet'] : '';
+$idOfPro = isset($_POST['idOfPro']) ? $_POST['idOfPro'] : '';
+$nameOfPro = isset($_POST['nameOfPro']) ? $_POST['nameOfPro'] : '';
+$chapOfPro = isset($_POST['chapOfPro']) ? $_POST['chapOfPro'] : '';
+$accOfPro = isset($_POST['accOfPro']) ? $_POST['accOfPro'] : '';
 
 switch ($action) {
     case 'login':
@@ -37,10 +50,28 @@ switch ($action) {
         reg($conn, $inputHo, $inputTen, $inputAcc, $inputPas);
         break;
     case 'loadlistinweek':
-        loadlistinweek($conn, $limit_iw);
+        loadlistinweek($conn, $pageChoose_iw);
         break;
     case 'loadlistSPH':
-        loadlistSPH($conn, $limit_sph);
+        loadlistSPH($conn, $pageChoose_sph);
+        break;
+    case 'listRevenu':
+        listRevenu($conn, $input_search, $date_from, $date_to, $pageChoose);
+        break;
+    case 'getInforFromDT':
+        getInforFromDT($conn);
+        break;
+    case 'spdoiduyet':
+        spdoiduyet($conn);
+        break;
+    case 'changeStatusProduct':
+        changeStatusProduct($conn, $idOfPro, $nameOfPro, $chapOfPro, $accOfPro, $pbiet);
+        break;
+    case 'quantity_tb':
+        quantity_tb($conn);
+        break;
+    case 'quant_mem_pro':
+        quant_mem_pro($conn);
         break;
     default:
         echo "Yêu cầu không đúng";
@@ -49,7 +80,7 @@ switch ($action) {
 function logout($conn)
 {
     unset($_SESSION['taikhoan']);
-    header('Location: trangchu.php');
+    header('Location: /project/LTWEB/CKI/html/trangchu.php');
 }
 
 function login($conn, $inputAcc, $inputPas)
@@ -79,10 +110,8 @@ function login($conn, $inputAcc, $inputPas)
             $_SESSION['ten'] = $row_check['ten'];
             $_SESSION['loai'] = $row_check['loai'];
 
-
             //đếm số hàng trả về của sản phẩm trong giỏ hàng
             $_SESSION['quantity_product'] = mysqli_fetch_array($thuchien_giohang)['quantity_product'];
-
 
             //nếu tổng tiền > 0 thì lấy tổng trả về, ngược lại < 0 => totalAmount = 0;
             if (mysqli_num_rows($thuchien_totalAmount) > 0) {
@@ -117,7 +146,7 @@ function reg($conn, $inputHo, $inputTen, $inputAcc, $inputPas)
             $thuchien_add = mysqli_query($conn, $add);
 
             if ($thuchien_add) {
-                //gắn biến toàn cục
+                //gắn biến
                 $_SESSION['taikhoan'] = $inputAcc;
                 $_SESSION['ten'] = $inputTen;
                 $_SESSION['loai'] = 1;
@@ -126,33 +155,28 @@ function reg($conn, $inputHo, $inputTen, $inputAcc, $inputPas)
     }
 }
 
-function loadlistinweek($conn, $limit_iw)
+function loadlistinweek($conn, $pageChoose_iw)
 {
-    $truyvan_quantitybooks = "SELECT COUNT(ten) AS quantitybooks FROM danhsachtruyen";
-    $thuchien_quantitybooks = mysqli_query($conn, $truyvan_quantitybooks);
+    $max_show = 5;
 
-    //đếm số lượng truyện trong table danhsachtruyen
-    $_SESSION['quantity_books'] = mysqli_fetch_array($thuchien_quantitybooks)['quantitybooks'];
+    //DATE_SUB(CURDATE(), INTERVAL 20 DAY): Hàm này trừ 20 ngày khỏi ngày hiện tại, tức là tính ngày cách đây 20 ngày từ hôm nay.
+    //DATE_SUB - INTERVAL: trừ; DATE_ADD - INTERVAL: cộng  
+    $truyvan_start = "SELECT * FROM danhsachtruyen WHERE ngay >= DATE_SUB(CURDATE(), INTERVAL 20 DAY) ORDER BY ngay ASC";
 
-    $truyvan_taikhoan = "SELECT COUNT(taikhoan) AS taikhoan FROM taikhoan";
-    $thuchien_taikhoan = mysqli_query($conn, $truyvan_taikhoan);
+    //tổng trang
+    $total = mysqli_num_rows(mysqli_query($conn, $truyvan_start));
 
-    //đếm số lượng taikhoan trong table taikhoan
-    $_SESSION['quantity_accounts'] = mysqli_fetch_array($thuchien_taikhoan)['taikhoan'];
+    //số trang cần để hiện dữ liệu
+    $page = ceil($total / $max_show);
 
-    $truyvan_all = "SELECT * FROM danhsachtruyen WHERE ngay >= DATE_SUB(CURDATE(), INTERVAL 20 DAY) AND soluongtonkho > 0 AND soluongdaban > 0";
-    $thuchien_all = mysqli_query($conn, $truyvan_all);
+    $start = ($pageChoose_iw - 1) * $max_show;
 
-    $truyvan_iw = $truyvan_all . " ORDER BY ngay DESC LIMIT $limit_iw";
-    $thuchien_iw = mysqli_query($conn, $truyvan_iw);
+    $truyvan = $truyvan_start . " LIMIT $start,$max_show";
+    $thuchien = mysqli_query($conn, $truyvan);
 
-    if ($thuchien_iw && $thuchien_all) {
-
-        $rows_all = mysqli_num_rows($thuchien_all);
-        $rows_iw = mysqli_num_rows($thuchien_iw);
-
-        if ($rows_iw > 0) {
-            while ($row = mysqli_fetch_assoc($thuchien_iw)) {
+    if ($thuchien) {
+        if (mysqli_num_rows($thuchien) > 0) {
+            while ($row = mysqli_fetch_array($thuchien)) {
                 $ten = $row['ten'];
                 $taptruyen = $row['taptruyen'];
                 $hinhanh = $row['hinhanh'];
@@ -167,35 +191,72 @@ function loadlistinweek($conn, $limit_iw)
                 echo "<img src='../$hinhanh'>";
                 echo "</div>";
                 echo "<div class='add_book'>";
-                echo "<button class='btn_themgiohang' id-product='$row[id]'>THÊM VÀO GIỎ</button>";
+                echo "<button class='btn_themgiohang' data-ten-product='$ten' data-taptruyen-product='$taptruyen' data-id-product='$row[id]'>THÊM VÀO GIỎ</button>";
                 echo "</div>";
                 echo "</div>";
             }
-            if ($rows_iw < $rows_all) {
-                $quantity_pro = $rows_all - $rows_iw;
-                echo "<div class='container_btn_loadlistinweek'><button class='btn_more_iw'>Xem thêm $quantity_pro sản phẩm khác</div>";
+
+            echo "<div class='container_btn_loadlistinweek'>";
+            if ($page >= 4) {
+                $begin = $pageChoose_iw - 1;
+                if ($begin < 1) {
+                    $begin = 1;
+                }
+                if ($pageChoose_iw < 2) {
+                    $end = $pageChoose_iw + 2;
+                } else {
+                    $end = $pageChoose_iw + 1;
+                }
+                if ($end > $page) {
+                    $end = $page;
+                    $begin = $page - 2;
+                }
+
+                //pre
+                if ($pageChoose_iw > 1) {
+                    echo "<button class='btn_pages_iw' num_page='" . ($pageChoose_iw - 1) . "'><i class='fa-solid fa-angles-left'></i></button>";
+                }
+
+                for ($i = $begin; $i <= $end; $i++) {
+                    echo "<button class='btn_pages_iw " . ($i == $pageChoose_iw ? 'change' : '') . "' num_page='$i'>$i</button>";
+                }
+
+                //next
+                if ($pageChoose_iw < $end) {
+                    echo "<button class='btn_pages_iw' num_page='" . ($pageChoose_iw + 1) . "'><i class='fa-solid fa-angles-right'></i></button>";
+                }
+            } else if ($page > 1 && $page <= 3) {
+                for ($i = 1; $i <= $page; $i++) {
+                    echo "<button class='btn_pages_iw " . ($i == $pageChoose_iw ? 'change' : '') . "' num_page='$i'>$i</button>";
+                }
             }
+            echo "</div>";
+        } else {
+            echo "Không có dữ liệu";
         }
     } else {
-        echo "Không thể truy vấn dữ liệu";
+        echo " " . $conn->error;
     }
 }
 
-function loadlistSPH($conn, $limit_sph)
+function loadlistSPH($conn, $pageChoose_sph)
 {
-    $truyvan_all = "SELECT * FROM danhsachtruyen WHERE soluongtonkho = 0 AND soluongdaban = 0";
-    $thuchien_all = mysqli_query($conn, $truyvan_all);
+    $max_show = 5;
 
-    $truyvan_sph = $truyvan_all . " ORDER BY ngay DESC LIMIT $limit_sph";
-    $thuchien_sph = mysqli_query($conn, $truyvan_sph);
+    $truyvan_start = "SELECT * FROM danhsachtruyen WHERE soluongtonkho = 0 AND soluongdaban = 0";
+    $thuchien_start = mysqli_query($conn, $truyvan_start);
+    $count = mysqli_num_rows($thuchien_start);
 
-    if ($thuchien_sph && $thuchien_all) {
+    $page = ceil($count / $max_show);
 
-        $rows_all = mysqli_num_rows($thuchien_all);
-        $rows_sph = mysqli_num_rows($thuchien_sph);
+    $start = ($pageChoose_sph - 1) * $max_show;
 
-        if ($rows_sph > 0) {
-            while ($row = mysqli_fetch_assoc($thuchien_sph)) {
+    $truyvan = $truyvan_start . " ORDER BY ngay DESC LIMIT $start,$max_show";
+    $thuchien = mysqli_query($conn, $truyvan);
+
+    if ($thuchien) {
+        if (mysqli_num_rows($thuchien) > 0) {
+            while ($row = mysqli_fetch_array($thuchien)) {
                 $ten = $row['ten'];
                 $taptruyen = $row['taptruyen'];
                 $hinhanh = $row['hinhanh'];
@@ -210,20 +271,387 @@ function loadlistSPH($conn, $limit_sph)
                 echo "<img src='../$hinhanh'>";
                 echo "</div>";
                 echo "<div class='add_book'>";
-                echo "<button class='btn_themgiohang' id-product='$row[id]'>THÊM VÀO GIỎ</button>";
+                echo "<button class='btn_themgiohang' data-ten-product='$ten' data-taptruyen-product='$taptruyen' data-id-product='$row[id]'>THÊM VÀO GIỎ</button>";
                 echo "</div>";
                 echo "</div>";
             }
-            if ($rows_sph < $rows_all) {
-                $quantity_pro = $rows_all - $rows_sph;
-                echo "<div class='container_btn_loadlistSPH'><button class='btn_more_sph'>Xem thêm $quantity_pro sản phẩm khác</div>";
+
+            echo "<div class='container_btn_loadlistsph'>";
+            if ($page >= 4) {
+                $begin = $pageChoose_sph - 1;
+                if ($begin < 1) {
+                    $begin = 1;
+                }
+                if ($pageChoose_sph < 2) {
+                    $end = $pageChoose_sph + 2;
+                } else {
+                    $end = $pageChoose_sph + 1;
+                }
+                if ($end > $page) {
+                    $end = $page;
+                    $begin = $page - 2;
+                }
+
+                //pre
+                if ($pageChoose_sph > 1) {
+                    echo "<button class='btn_pages_sph' num_page='" . ($pageChoose_sph - 1) . "'><i class='fa-solid fa-angles-left'></i></button>";
+                }
+
+                for ($i = $begin; $i <= $end; $i++) {
+                    echo "<button class='btn_pages_sph " . ($i == $pageChoose_sph ? 'change' : '') . "' num_page='$i'>$i</button>";
+                }
+
+                //next
+                if ($pageChoose_sph < $end) {
+                    echo "<button class='btn_pages_sph' num_page='" . ($pageChoose_sph + 1) . "'><i class='fa-solid fa-angles-right'></i></button>";
+                }
+            } else if ($page > 1 && $page <= 3) {
+                for ($i = 1; $i <= $page; $i++) {
+                    echo "<button class='btn_pages_sph " . ($i == $pageChoose_sph ? 'change' : '') . "' num_page='$i'>$i</button>";
+                }
             }
+            echo "</div>";
+        } else {
+            echo "Không có dữ liệu";
         }
-    } else {
-        echo "Không thể truy vấn dữ liệu";
     }
 }
 
+function quant_mem_pro($conn)
+{
+    $data = [];
+
+    $truyvan_member = "SELECT * FROM taikhoan";
+    $thuchien_member = mysqli_query($conn, $truyvan_member);
+    $quantity_member = mysqli_num_rows($thuchien_member);
+    $data['quantity_member'] = $quantity_member;
+
+    $truyvan_product = "SELECT * FROM danhsachtruyen";
+    $thuchien_product = mysqli_query($conn, $truyvan_product);
+    $quantity_product = mysqli_num_rows($thuchien_product);
+    $data['quantity_product'] = $quantity_product;
+
+    header('Content-Type: application/json');
+    echo json_encode($data);
+}
+
+//doanh thu
+function listRevenu($conn, $input_search, $date_from, $date_to, $pageChoose)
+{
+    $truyvan = "SELECT * FROM doanhthu";
+
+    //tổng số sản phẩm
+    $total_record = "SELECT * FROM doanhthu";
+    $thuchien_total_record = mysqli_query($conn, $total_record);
+
+    //tính số trang cần hiển thị đủ product
+    $total = mysqli_num_rows($thuchien_total_record);
+
+    //tổng product hủy
+    $total_hanghuy = $total_record . " WHERE trangthai = 2";
+    $thuchien_hanghuy = mysqli_query($conn, $total_hanghuy);
+    $total_hanghuy = mysqli_num_rows($thuchien_hanghuy);
+
+    //tổng product chờ duyệt
+    $total_duyet = $total_record . " WHERE trangthai = 0";
+    $thuchien_duyet = mysqli_query($conn, $total_duyet);
+    $total_duyet = mysqli_num_rows($thuchien_duyet);
+
+    if ($input_search || $date_from || $date_to) {
+
+        $truyvan_end = " WHERE (taikhoan like '%$input_search%' OR tentruyen like '%$input_search%' OR taptruyen like '%$input_search%' OR '$input_search' = '') AND (ngaymua >= '$date_from' OR '$date_from' = '') AND (ngaymua <= '$date_to' OR '$date_to' = '')";
+
+        $truyvan = $truyvan . $truyvan_end;
+        $truyvan_totalAmount = "SELECT SUM(thanhtien) AS thanhtien FROM doanhthu" . $truyvan_end;
+        $thuchien_totalAmount = mysqli_query($conn, $truyvan_totalAmount);
+
+        if ($thuchien_totalAmount) {
+            $row = mysqli_fetch_assoc($thuchien_totalAmount);
+            $totalAmount = number_format($row['thanhtien'], 0, '', '.') . " vnd";
+        } else {
+            echo " " . $conn->error;
+        }
+
+    } else if (!$input_search && !$date_from && !$date_to) {
+        //phân trang
+        //số product tối đa mỗi trang
+        $max_show = 1;
+
+        $page = ceil($total / $max_show);
+
+        $start = ((int)$pageChoose - 1) * $max_show;
+
+        $truyvan = $truyvan . " LIMIT $start,$max_show";
+    }
+
+    $thuchien = mysqli_query($conn, $truyvan);
+
+    if ($thuchien) {
+
+        if (!isset($totalAmount)) {
+            $totalAmount = "";
+        }
+        echo "<div class='container_input_totalAmount'>";
+        echo "Tổng đơn hàng hoàn thành: $total | Tổng đơn hàng chờ duyệt: $total_duyet | Tổng đơn hàng đã hủy: $total_hanghuy";
+        echo "<input type='text' value='$totalAmount' readonly placeholder='Tổng tiền'>";
+        echo "</div>";
+
+        if (mysqli_num_rows($thuchien) > 0) {
+            echo "<table>";
+            echo "<thead>";
+            echo "<tr>";
+            echo "<th>STT</th>";
+            echo "<th>Tài khoản</th>";
+            echo "<th>Tên truyện</th>";
+            echo "<th>Tập truyện</th>";
+            echo "<th>Giá</th>";
+            echo "<th>Số lượng</th>";
+            echo "<th>Thành tiền</th>";
+            echo "<th>Thời gian</th>";
+            echo "<th>Trạng thái</th>";
+            echo "</tr>";
+            echo "</thead>";
+            echo "<tbody>";
+
+            while ($row = mysqli_fetch_array($thuchien)) {
+                $gia = number_format($row['gia'], 0, '', '.') . " vnd";
+                $thanhtien = number_format($row['thanhtien'], 0, '', '.') . "vnd";
+                echo "<tr>";
+                echo "<td>" . $row['id'] . "</td>";
+                echo "<td>" . $row['taikhoan'] . "</td>";
+                echo "<td>" . (mb_strlen($row['tentruyen']) > 13 ? mb_substr($row['tentruyen'], 0, 13) . "..." : $row['tentruyen']) . "</td>";
+                echo "<td>" . (mb_strlen($row['taptruyen']) > 15 ? mb_substr($row['taptruyen'], 0, 15) . "..." : $row['taptruyen']) . "</td>";
+                echo "<td>" . $gia . "</td>";
+                echo "<td>" . $row['soluong'] . "</td>";
+                echo "<td>" . $thanhtien . "</td>";
+                echo "<td>" . $row['ngaymua'] . "</td>";
+                if ($row['trangthai'] == 1) {
+                    echo "<td><i style='color: white; background-color: green; padding: 2% 2.5%; border-radius: 50%' class='fa-solid fa-check'></i></td>";
+                } else if ($row['trangthai'] == 2) {
+                    echo "<td><i style='color: white; background-color: red; padding: 2% 4%; border-radius: 50%' <i class='fa-solid fa-x'></i></i></td>";
+                } else {
+                    echo "<td><i style='color: black; background-color: transparent; font-size: 1.3pc; border-radius: 50%' class='fa-solid fa-clock-rotate-left'></i></td>";
+                }
+                echo "</tr>";
+            }
+
+            echo "</tbody>";
+            echo "</table>";
+
+            echo "<div class='pag'>";
+            if (!$input_search && !$date_from && !$date_to) {
+                if ($page > 3) {
+
+                    $begin = $pageChoose - 1;
+                    if ($begin < 1) {
+                        $begin = 1;
+                    }
+                    if ($pageChoose < 2) {
+                        $end = $pageChoose + 2;
+                    } else {
+                        $end = $pageChoose + 1;
+                    }
+                    if ($end > $page) {
+                        $end = $page;
+                        $begin = $page - 2;
+                    }
+
+                    //pre
+                    if ($pageChoose > 1) {
+                        echo "<button class='btn_pages' num_page='" . ($pageChoose - 1) . "'><i class='fa-solid fa-angles-left'></i></button>";
+                    }
+
+                    for ($i = $begin; $i <= $end; $i++) {
+                        echo "<button class='btn_pages " . ($i == $pageChoose ? 'change' : '') . "' num_page='$i'>$i</button>";
+                    }
+
+                    //next
+                    if ($pageChoose < $end) {
+                        echo "<button class='btn_pages' num_page='" . ($pageChoose + 1) . "'><i class='fa-solid fa-angles-right'></i></button>";
+                    }
+                } else if (1 < $page && $page <= 5) {
+                    if ($pageChoose > 1) {
+                        echo "<button class='btn_pages' num_page='" . ($pageChoose - 1) . "'><i class='fa-solid fa-angles-left'></i></button>";
+                    }
+
+                    for ($i = 1; $i <= $page; $i++) {
+                        echo "<button class='btn_pages " . ($i == $pageChoose ? 'change' : '') . "' num_page='$i'>$i</button>";
+                    }
+
+                    //next
+                    if ($pageChoose < $page) {
+                        echo "<button class='btn_pages' num_page='" . ($pageChoose + 1) . "'><i class='fa-solid fa-angles-right'></i></button>";
+                    }
+                }
+            }
+            echo "</div>";
+        } else {
+            echo "Không có dữ liệu";
+        }
+    } else {
+        die("Lỗi truy vấn: " . $conn->error);
+    }
+}
+
+function getInforFromDT($conn)
+{
+    //ngày tháng năm hiện tại
+    $currentDate = date('Y-m-d');
+
+    $truyvan_time = "SELECT DATE_FORMAT(ngaymua, '%H') AS hour, SUM(thanhtien) AS thanhtien 
+                     FROM doanhthu 
+                     WHERE DATE(ngaymua) = '$currentDate' AND trangthai = 1
+                     GROUP BY DATE_FORMAT(ngaymua, '%H') 
+                     ORDER BY DATE_FORMAT(ngaymua, '%H') ASC";
+    $thuchien_time = mysqli_query($conn, $truyvan_time);
+
+    //tháng năm hiện tại
+    $currentYM = date('Y-m');
+
+    //truy vấn lấy tháng năm
+    $truyvan_date = "SELECT DATE_FORMAT(ngaymua, '%d') AS day, SUM(thanhtien) AS tien_ngay 
+                     FROM doanhthu 
+                     WHERE DATE_FORMAT(ngaymua, '%Y-%m') = '$currentYM' AND trangthai = 1
+                     GROUP BY DATE_FORMAT(ngaymua, '%d') 
+                     ORDER BY DATE_FORMAT(ngaymua, '%d') ASC";
+    $thuchien_date = mysqli_query($conn, $truyvan_date);
+
+    //năm hiện tại
+    $currentY = date('Y');
+
+    //truy vấn lấy năm
+    $truyvan_month = "SELECT DATE_FORMAT(ngaymua, '%m') AS month, SUM(thanhtien) AS tien_thang 
+                     FROM doanhthu 
+                     WHERE DATE_FORMAT(ngaymua, '%Y') = '$currentY' AND trangthai = 1
+                     GROUP BY DATE_FORMAT(ngaymua, '%m') 
+                     ORDER BY DATE_FORMAT(ngaymua, '%m') ASC";
+    $thuchien_month = mysqli_query($conn, $truyvan_month);
+
+    //lấy số lượng bán được của truyện
+    $truyvan_bestsell = "SELECT SUM(soluong) AS totalQuantity, tentruyen, taptruyen
+                         FROM doanhthu 
+                         WHERE trangthai = 1
+                         GROUP BY tentruyen, taptruyen 
+                         ORDER BY totalQuantity DESC 
+                         LIMIT 10";
+
+    $thuchien_bestsell = mysqli_query($conn, $truyvan_bestsell);
+
+    if ($thuchien_time && mysqli_num_rows($thuchien_time) > 0) {
+        while ($row = mysqli_fetch_array($thuchien_time)) {
+            $data['time'][] = $row;
+        }
+    }
+
+    if ($thuchien_date && mysqli_num_rows($thuchien_date) > 0) {
+        while ($row = mysqli_fetch_array($thuchien_date)) {
+            $data['date'][] = $row;
+        }
+    }
+
+    if ($thuchien_month && mysqli_num_rows($thuchien_month) > 0) {
+        while ($row = mysqli_fetch_array($thuchien_month)) {
+            $data['month'][] = $row;
+        }
+    }
+
+    if ($thuchien_bestsell && mysqli_num_rows($thuchien_bestsell) > 0) {
+        while ($row = mysqli_fetch_array($thuchien_bestsell)) {
+            $data['quantity_product'][] = $row;
+        }
+    }
+
+    header('Content-Type: application/json');
+    echo json_encode($data);
+}
+
+function quantity_tb($conn)
+{
+    $truyvan = "SELECT * FROM doanhthu WHERE trangthai = 0 ORDER BY ngaymua DESC";
+    $thuchien = mysqli_query($conn, $truyvan);
+    $count = mysqli_num_rows($thuchien);
+
+    echo $count;
+}
+
+function spdoiduyet($conn)
+{
+    $truyvan = "SELECT * FROM doanhthu WHERE trangthai = 0 ORDER BY ngaymua DESC";
+    $thuchien = mysqli_query($conn, $truyvan);
+    $count = mysqli_num_rows($thuchien);
+
+    echo "Tổng đơn hàng chờ duyệt: $count";
+
+    if ($thuchien && $count > 0) {
+        echo "<table>";
+        echo "<thead>";
+        echo "<tr>";
+        echo "<th>STT</th>";
+        echo "<th>Tài khoản</th>";
+        echo "<th>Tên truyện</th>";
+        echo "<th>Tập truyện</th>";
+        echo "<th>Giá</th>";
+        echo "<th>Số lượng</th>";
+        echo "<th>Thành tiền</th>";
+        echo "<th>Thời gian</th>";
+        echo "<th>Trạng thái</th>";
+        echo "<th>Chức năng</th>";
+        echo "</tr>";
+        echo "</thead>";
+        echo "<tbody>";
+
+        $i = 1;
+
+        while ($row = mysqli_fetch_array($thuchien)) {
+            $stt = $i++;
+            $gia = number_format($row['gia'], 0, '', '.') . " vnd";
+            $thanhtien = number_format($row['thanhtien'], 0, '', '.') . "vnd";
+            echo "<tr>";
+            echo "<td>$stt</td>";
+            echo "<td>" . $row['taikhoan'] . "</td>";
+            echo "<td>" . (mb_strlen($row['tentruyen']) > 13 ? mb_substr($row['tentruyen'], 0, 13) . "..." : $row['tentruyen']) . "</td>";
+            echo "<td>" . (mb_strlen($row['taptruyen']) > 15 ? mb_substr($row['taptruyen'], 0, 15) . "..." : $row['taptruyen']) . "</td>";
+            echo "<td>" . $gia . "</td>";
+            echo "<td>" . $row['soluong'] . "</td>";
+            echo "<td>" . $thanhtien . "</td>";
+            echo "<td>" . $row['ngaymua'] . "</td>";
+            echo "<td>Chờ duyệt</td>";
+            echo "<td>
+            <button class='btn_choduyet' id='$row[id]' tentruyen='$row[tentruyen]' taptruyen='$row[taptruyen]' taikhoan='$row[taikhoan]'>Duyệt</button>
+            |
+            <button class='btn_huydon' id='$row[id]' tentruyen='$row[tentruyen]' taptruyen='$row[taptruyen]' taikhoan='$row[taikhoan]'>Xóa</button>
+            </td>";
+            echo "</tr>";
+        }
+
+        echo "</tbody>";
+        echo "</table>";
+    } else {
+        echo "<br>";
+        echo "Không có sản phẩm chờ duyệt";
+    }
+}
+
+function changeStatusProduct($conn, $idOfPro, $nameOfPro, $chapOfPro, $accOfPro, $pbiet)
+{
+    if ($pbiet == "duyet") {
+        $truyvan = "UPDATE doanhthu SET trangthai = 1 WHERE id = '$idOfPro' AND taikhoan = '$accOfPro' AND tentruyen = '$nameOfPro' AND taptruyen = '$chapOfPro'";
+        $thuchien = mysqli_query($conn, $truyvan);
+        if ($thuchien) {
+            echo "ok";
+        } else {
+            echo " " . $conn->error;
+        }
+    } else if ($pbiet == "huy") {
+        $truyvan = "UPDATE doanhthu SET trangthai = 2 WHERE id = '$idOfPro' AND taikhoan = '$accOfPro' AND tentruyen = '$nameOfPro' AND taptruyen = '$chapOfPro'";
+        $thuchien = mysqli_query($conn, $truyvan);
+        if ($thuchien) {
+            echo "ok";
+        } else {
+            echo " " . $conn->error;
+        }
+    }
+}
 
 // Sau khi kết thúc công việc, đóng kết nối
 mysqli_close($conn);

@@ -1,0 +1,111 @@
+/* Căn bản */
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  margin: 20px;
+}
+
+h2 {
+  text-align: center;
+}
+
+/* Bảng */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+table,
+th,
+td {
+  border: 2px solid #ddd;
+}
+
+th,
+td {
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #2b2828;
+}
+
+/* Các nút hành động */
+.table-actions {
+  display: flex;
+  gap: 10px;
+}
+
+
+
+.table-actions a {
+  color: #fff;
+  /* Màu chữ cho liên kết */
+}
+
+.table-actions a:hover,
+.table-actions form input[type="submit"]:hover {
+  background-color: #0056b3;
+  /* Màu nền khi di chuột qua cho các nút */
+  border-color: #004494;
+  /* Đổi màu đường viền khi di chuột qua */
+}
+
+/* Form
+  form {
+    margin: 20px 0;
+    border: 1px solid #8d1111;
+    padding: 20px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+  } */
+
+form input[type="text"],
+form input[type="date"],
+form input[type="file"] {
+  width: calc(100% - 22px);
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+/* form input[type="submit"] {
+    background-color: #121312;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+  } */
+
+form input[type="submit"]:hover {
+  background-color: #45a049;
+}
+
+/* Nhóm form */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #0b8f3e;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.form-group input[type="file"] {
+  padding: 3px;
+}

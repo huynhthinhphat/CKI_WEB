@@ -9,13 +9,16 @@ session_start();
     <title>Trang chủ</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/header.css">
-    <link rel="stylesheet" href="../css/footer.css">
+    <link rel="stylesheet" href="/project/LTWEB/CKI/css/style.css">
+    <link rel="stylesheet" href="/project/LTWEB/CKI/css/header.css">
+    <link rel="stylesheet" href="/project/LTWEB/CKI/css/footer.css">
+    <link rel="stylesheet" href="/project/LTWEB/CKI/css/doanhthu.css">
 
     <!-- js -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="../js/trangchu.js"></script>
+    <script src="/project/LTWEB/CKI/js/trangchu.js"></script>
+    <script src="/project/LTWEB/CKI/js/add_book.js"></script>
+
 </head>
 
 <body>
@@ -26,7 +29,7 @@ session_start();
 
     <!-- Body -->
     <div id="container_img">
-        <img src="../img/logo/anh_trangchu.webp" alt="">
+        <img src="../img/logo/anhnen_trangchu.jpg" alt="">
     </div>
 
     <div id="container_introduce">
@@ -88,14 +91,8 @@ session_start();
                         <p>Thành Viên</p>
                     </div>
                     <div>
-                        <p>
-                            <?php
-                            if (isset($_SESSION['quantity_accounts'])) {
-                                echo $_SESSION['quantity_accounts'];
-                            } else {
-                                echo "0";
-                            }
-                            ?>
+                        <p id="tvien">
+                            0
                         </p>
                     </div>
                 </div>
@@ -109,14 +106,8 @@ session_start();
                         <p>Sản Phẩm</p>
                     </div>
                     <div>
-                        <p>
-                            <?php
-                            if (isset($_SESSION['quantity_books'])) {
-                                echo $_SESSION['quantity_books'];
-                            } else {
-                                echo "0";
-                            }
-                            ?>
+                        <p id="spham">
+                            0
                         </p>
                     </div>
                 </div>

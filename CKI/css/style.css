@@ -6,6 +6,7 @@
 
 html {
     scrollbar-width: thin;
+    scroll-behavior: smooth;
 }
 
 #container_img {
@@ -203,7 +204,6 @@ html {
     overflow: hidden;
     position: relative;
     margin-bottom: 5%;
-    /* box-shadow: 0px 2px 5px rgb(187, 187, 187); */
 }
 
 .container_img_members_books img {
@@ -389,4 +389,81 @@ html {
     width: 100%;
     display: flex;
     justify-content: space-around;
+}
+
+.btn_pages_iw,
+.btn_pages_sph {
+    cursor: pointer;
+    border: none;
+    border-radius: 50%;
+    padding: .3% .65%;
+    margin: 0 1px;
+}
+
+.changesta {
+    color: whitesmoke;
+    background-color: #5d8650 !important;
+}
+
+#container_find {
+    width: 92%;
+    margin: 2% 0;
+    padding: 0 4%;
+}
+
+#title_find {
+    background-color: whitesmoke;
+    padding: .5% 0 .5% 1%;
+}
+
+#title_find a,
+#title_find i {
+    color: black;
+    margin-right: .5%;
+    text-decoration: none;
+    font-size: 3vh;
+}
+
+#content_find {
+    width: 100%;
+}
+
+#container_result {
+    width: 100%;
+    padding-top: 1%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#dialog_button {
+    position: fixed;
+    z-index: 100;
+    bottom: 2.5%;
+    right: 1%;
+    display: flex;
+    flex-direction: column;
+}
+
+#dialog_button button {
+    cursor: pointer;
+    width: 2pc;
+    height: 2pc;
+    border: 0.5px solid gray;
+    border-radius: 50%;
+    background-color: whitesmoke;
+    font-size: 1.1pc;
+    box-shadow: 0px 1px 3px 0px gray;
+    transition: .3s ease;
+}
+
+#dialog_button button:last-child {
+    margin-top: 15%;
+}
+
+#dialog_button button:hover {
+    transform: scale(1.1);
+}
+
+#dialog_button button:active {
+    transform: scale(0.5);
 }

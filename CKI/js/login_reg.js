@@ -128,14 +128,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         $.ajax({
-            url: 'api.php?action=login',
+            url: '/project/LTWEB/CKI/html/api.php?action=login',
             method: 'post',
             data: { inputAcc: inputs[0].value, inputPas: inputs[1].value },
             success: function (res) {
                 if (res == "Không") {
                     $("#tbao_login").html("Tài khoản hoặc mật khẩu sai");
                 } else {
-                    window.location.href = '../html/trangchu.php'
+                    window.location.href = '/project/LTWEB/CKI/html/trangchu.php'
                 }
             }
         })
@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 $("#tbao_reg").html("Mật khẩu nhập lại sai");
             } else {
                 $.ajax({
-                    url: 'api.php?action=reg',
+                    url: '/project/LTWEB/CKI/html/api.php?action=reg',
                     method: 'post',
                     data: { inputHo: inputs[2].value, inputTen: inputs[3].value, inputAcc: inputs[4].value, inputPas: inputs[5].value },
                     success: function (res) {

@@ -116,8 +116,14 @@ header div:last-child li div:last-child div:first-child {
 }
 
 #taikhoan_xinchao span,
-#giohang span {
+.giohang span,.thongbao span {
     font-weight: bold;
+}
+
+.thongbao{
+    height: 100% !important;
+    display: flex;
+    justify-content: center !important;
 }
 
 header div:last-child li:hover {

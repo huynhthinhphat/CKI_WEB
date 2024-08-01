@@ -1,100 +1,98 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    var giohang_canhan = document.getElementById('giohang_canhan');
-
-    giohang_canhan.addEventListener('click', function () {
-        window.location.href = '../html/giohang.php'
-    })
-
-    function loadlistinweek() {
+    function tb() {
         $.ajax({
-            url: 'api.php?action=loadlistinweek',
-            method: 'post',
+            url: '/project/LTWEB/CKI/html/api.php?action=quantity_tb',
             success: function (res) {
                 if (res) {
-                    $("#books").html(res);
-                } else {
-                    $("#books").html("Không có dữ liệu");
+                    $("#context_tb").html("Thông báo (" + res + ")");
                 }
             }
         })
     }
-    loadlistinweek();
+
+    tb();
+
+    var giohang_canhan = document.getElementById('giohang_canhan');
+
+    //lấy tất cả thẻ bên trong div
+    var elements = giohang_canhan.getElementsByTagName('*');
+
+    giohang_canhan.addEventListener('click', function () {
+        for (let element of elements) {
+            if (element.classList.contains('giohang')) {
+                window.location.href = '/project/LTWEB/CKI/html/giohang.php'
+            } else if (element.classList.contains('thongbao')) {
+                window.location.href = '/project/LTWEB/CKI/html/spdoiduyet/spdoiduyet.php'
+            }
+        }
+    })
+
+    //phân trang
+    $(document).on('click', '.btn_pages_iw', function () {
+        loadlistinweek(this.getAttribute('num_page'));
+    });
+
+    function loadlistinweek(pageChoose) {
+        $.ajax({
+            url: '/project/LTWEB/CKI/html/api.php?action=loadlistinweek',
+            data: { pageChoose_iw: pageChoose },
+            method: 'post',
+            success: function (res) {
+                $("#books").html(res);
+            }
+        });
+    }
+    loadlistinweek(1);
+
+    $(document).on('click', '.btn_pages_sph', function () {
+        loadlistSPH(this.getAttribute('num_page'));
+    });
 
     //load danh sách sản phẩm sắp phát hành
-    function loadlistSPH() {
+    function loadlistSPH(pageChoose) {
         $.ajax({
-            url: 'api.php?action=loadlistSPH',
+            url: '/project/LTWEB/CKI/html/api.php?action=loadlistSPH',
+            data: { pageChoose_sph: pageChoose },
             method: 'post',
             success: function (res) {
                 $("#books_sph").html(res);
+                add_book();
             }
         })
     }
-    loadlistSPH();
+    loadlistSPH(1);
 
-    // Lắng nghe sự kiện click trên các item_book và các phần tử con của nó
-    document.addEventListener("click", function (event) {
-        //button thêm vào giỏ hàng
-        var btn_themgiohang = event.target.classList.contains("btn_themgiohang")
-
-        // Kiểm tra xem phần tử được click là item_book hoặc con của item_book
-        var itemBook = event.target.closest(".item_book");
-
-        //phần tử được click là con của .item-book và ko phải button có class btn_themgiohang
-        if (itemBook && !btn_themgiohang) {
-            // Lấy id-product từ thuộc tính của item_book
-            var productId = itemBook.getAttribute("id-product");
-
-            //chuyển đến trang chitietsanpham.php kèm theo id
-            window.location.href = '../html/chitietsp.php?id=' + productId;
-        }
-
-        // Kiểm tra sự kiện click trên nút "THÊM VÀO GIỎ"
-        if (event.target.classList.contains("btn_themgiohang")) {
-
-            // Lấy id-product từ thuộc tính của nút "THÊM VÀO GIỎ"
-            var productId = event.target.getAttribute("id-product");
-            alert("Đã thêm sản phẩm có ID =", productId, "vào giỏ hàng.");
-        }
-    });
-
-    var limit_iw = 5;
-    var i_iw = 2;
-
-    $(document).on('click', '.container_btn_loadlistinweek .btn_more_iw', function () {
+    //số lượng member, sản phẩm
+    function quant_mem_pro() {
         $.ajax({
-            url: 'api.php?action=loadlistinweek',
-            method: 'post',
-            data: { limit_iw: limit_iw * i_iw },
+            url: '/project/LTWEB/CKI/html/api.php?action=quant_mem_pro',
             success: function (res) {
                 if (res) {
-                    $("#books").html(res);
+                    $("#tvien").html(res.quantity_member);
+                    $("#spham").html(res.quantity_product);
                 } else {
-                    $("#books").html("Không có dữ liệu");
+                    $("#tvien").html("0");
+                    $("#spham").html("0");
                 }
             }
         })
-        i_iw++;
-    })
+    }
 
-    var limit_sph = 5;
-    var i_sph = 2;
+    quant_mem_pro();
 
-    $(document).on('click', '.container_btn_loadlistSPH .btn_more_sph', function () {
-        $.ajax({
-            url: 'api.php?action=loadlistSPH',
-            method: 'post',
-            data: { limit_sph: limit_sph * i_sph },
-            success: function (res) {
-                if (res) {
-                    $("#books_sph").html(res);
-                } else {
-                    $("#books_sph").html("Không có dữ liệu");
-                }
-            }
-        })
-        i_sph++;
-    })
+    function add_book() {
+        var btn_themgiohang = document.querySelectorAll('.item_book .btn_themgiohang');
+        btn_themgiohang.forEach(function (item) {
+            item.addEventListener('click', function () {
+                var productId = this.getAttribute("data-id-product");
+                var productName = this.getAttribute("data-ten-product");
+                var productChap = this.getAttribute("data-taptruyen-product");
+                console.log(productId);
+                console.log(productName);
+                console.log(productChap);
+            });
+        });
+    }
+
 })
-// 3 trang sp, chi tiết sản phẩm, đơn đặt hàng, session là gì
