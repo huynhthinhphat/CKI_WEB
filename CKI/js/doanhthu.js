@@ -52,8 +52,9 @@ document.addEventListener('DOMContentLoaded', function () {
     //sơ đồ
     function getInforFromDT() {
         $.ajax({
-            url: '/project/LTWEB/CKI/html/api.php?  action=getInforFromDT',
+            url: '/project/LTWEB/CKI/html/api.php?action=getInforFromDT',
             success: function (res) {
+                console.log(res)
                 if (res.time) {
                     timeOfDay = [];
                     for (var i = 0; i < res.time.length; i++) {

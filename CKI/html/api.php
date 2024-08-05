@@ -39,6 +39,19 @@ $nameOfPro = isset($_POST['nameOfPro']) ? $_POST['nameOfPro'] : '';
 $chapOfPro = isset($_POST['chapOfPro']) ? $_POST['chapOfPro'] : '';
 $accOfPro = isset($_POST['accOfPro']) ? $_POST['accOfPro'] : '';
 
+//biến nhận được khi mua ngay
+$id_product = isset($_GET['id']) ? $_GET['id'] : '';
+
+//thông tin mua ngay
+$selectedText_City = isset($_POST['selectedText_City']) ? $_POST['selectedText_City'] : '';
+$selectedText_Districts = isset($_POST['selectedText_Districts']) ? $_POST['selectedText_Districts'] : '';
+$selectedText_Ward = isset($_POST['selectedText_Ward']) ? $_POST['selectedText_Ward'] : '';
+$diachicuthe = isset($_POST['diachicuthe']) ? $_POST['diachicuthe'] : '';
+$sdt = isset($_POST['sdt']) ? $_POST['sdt'] : '';
+$radioValue = isset($_POST['radioValue']) ? $_POST['radioValue'] : '';
+$tongcong = isset($_POST['tongcong']) ? $_POST['tongcong'] : '';
+$id_thanhtoan = isset($_POST['id_thanhtoan']) ? $_POST['id_thanhtoan'] : '';
+
 switch ($action) {
     case 'login':
         login($conn, $inputAcc, $inputPas);
@@ -73,6 +86,15 @@ switch ($action) {
     case 'quant_mem_pro':
         quant_mem_pro($conn);
         break;
+    case 'totalAmount_giohang':
+        totalAmount_giohang($conn);
+        break;
+    case 'buy':
+        buy($conn, $id_product);
+        break;
+    case 'thanhtoan':
+        thanhtoan($conn, $id_thanhtoan, $selectedText_City, $selectedText_Districts, $selectedText_Ward, $diachicuthe, $sdt, $radioValue, $tongcong);
+        break;
     default:
         echo "Yêu cầu không đúng";
         break;
@@ -83,22 +105,44 @@ function logout($conn)
     header('Location: /project/LTWEB/CKI/html/trangchu.php');
 }
 
+function totalAmount_giohang($conn)
+{
+    $data = [];
+
+    //đếm số lượng sản phẩm trong giỏ hàng của người dùng
+    $truyvan_giohang = "SELECT COUNT(*) AS quantity_product FROM giohang WHERE BINARY taikhoan = '$_SESSION[taikhoan]'";
+    $thuchien_giohang = mysqli_query($conn, $truyvan_giohang);
+
+    //đếm số tiền của giỏ hàng
+    $truyvan_totalAmount = "SELECT SUM(thanhtien) AS totalAmount FROM giohang WHERE BINARY taikhoan = '$_SESSION[taikhoan]'";
+    $thuchien_totalAmount = mysqli_query($conn, $truyvan_totalAmount);
+
+    //kiểm tra truy vấn thành công hay không
+    if ($thuchien_giohang && $thuchien_totalAmount) {
+        //đếm số hàng trả về của sản phẩm trong giỏ hàng
+        $data['quantity_product'] = mysqli_fetch_array($thuchien_giohang)['quantity_product'];
+
+        //nếu tổng tiền > 0 thì lấy tổng trả về, ngược lại < 0 => totalAmount = 0;
+        if (mysqli_num_rows($thuchien_totalAmount) > 0) {
+            $row_totalAmount = mysqli_fetch_assoc($thuchien_totalAmount);
+            $data['totalAmount'] = $row_totalAmount['totalAmount'];
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    } else {
+        echo " " . $conn->error;
+    }
+}
+
 function login($conn, $inputAcc, $inputPas)
 {
     //tìm kiếm tài khoản
     $truyvan_check = "SELECT * FROM taikhoan WHERE BINARY taikhoan = '$inputAcc' AND BINARY matkhau = '$inputPas'";
     $thuchien_check = mysqli_query($conn, $truyvan_check);
 
-    //đếm số lượng sản phẩm trong giỏ hàng của người dùng
-    $truyvan_giohang = "SELECT COUNT(*) AS quantity_product FROM giohang WHERE BINARY taikhoan = '$inputAcc'";
-    $thuchien_giohang = mysqli_query($conn, $truyvan_giohang);
-
-    //đếm số tiền của giỏ hàng
-    $truyvan_totalAmount = "SELECT SUM(thanhtien) AS totalAmount FROM giohang WHERE BINARY taikhoan = '$inputAcc'";
-    $thuchien_totalAmount = mysqli_query($conn, $truyvan_totalAmount);
-
     //kiểm tra truy vấn thành công hay không
-    if ($thuchien_check && $thuchien_giohang && $thuchien_totalAmount) {
+    if ($thuchien_check) {
         //kiểm tra có dữ liệu cần tìm không || nếu có thì số dòng trả về sẽ lớn hơn 1
         if (mysqli_num_rows($thuchien_check) > 0) {
 
@@ -108,18 +152,9 @@ function login($conn, $inputAcc, $inputPas)
             //gắn biến toàn cục
             $_SESSION['taikhoan'] = $row_check['taikhoan'];
             $_SESSION['ten'] = $row_check['ten'];
+            $_SESSION['ho'] = $row_check['ho'];
             $_SESSION['loai'] = $row_check['loai'];
-
-            //đếm số hàng trả về của sản phẩm trong giỏ hàng
-            $_SESSION['quantity_product'] = mysqli_fetch_array($thuchien_giohang)['quantity_product'];
-
-            //nếu tổng tiền > 0 thì lấy tổng trả về, ngược lại < 0 => totalAmount = 0;
-            if (mysqli_num_rows($thuchien_totalAmount) > 0) {
-                $row_totalAmount = mysqli_fetch_assoc($thuchien_totalAmount);
-                $_SESSION['totalAmount'] = $row_totalAmount['totalAmount'];
-            } else {
-                $_SESSION['totalAmount'] = 0;
-            }
+            $_SESSION['email'] = $row_check['email'];
 
             echo "ok";
         } else {
@@ -359,7 +394,7 @@ function listRevenu($conn, $input_search, $date_from, $date_to, $pageChoose)
 
     if ($input_search || $date_from || $date_to) {
 
-        $truyvan_end = " WHERE (taikhoan like '%$input_search%' OR tentruyen like '%$input_search%' OR taptruyen like '%$input_search%' OR '$input_search' = '') AND (ngaymua >= '$date_from' OR '$date_from' = '') AND (ngaymua <= '$date_to' OR '$date_to' = '')";
+        $truyvan_end = " WHERE (taikhoan like '%$input_search%' '$input_search' = '') AND (ngaymua >= '$date_from' OR '$date_from' = '') AND (ngaymua <= '$date_to' OR '$date_to' = '')";
 
         $truyvan = $truyvan . $truyvan_end;
         $truyvan_totalAmount = "SELECT SUM(thanhtien) AS thanhtien FROM doanhthu" . $truyvan_end;
@@ -375,11 +410,11 @@ function listRevenu($conn, $input_search, $date_from, $date_to, $pageChoose)
     } else if (!$input_search && !$date_from && !$date_to) {
         //phân trang
         //số product tối đa mỗi trang
-        $max_show = 1;
+        $max_show = 5;
 
         $page = ceil($total / $max_show);
 
-        $start = ((int)$pageChoose - 1) * $max_show;
+        $start = ((int) $pageChoose - 1) * $max_show;
 
         $truyvan = $truyvan . " LIMIT $start,$max_show";
     }
@@ -402,10 +437,6 @@ function listRevenu($conn, $input_search, $date_from, $date_to, $pageChoose)
             echo "<tr>";
             echo "<th>STT</th>";
             echo "<th>Tài khoản</th>";
-            echo "<th>Tên truyện</th>";
-            echo "<th>Tập truyện</th>";
-            echo "<th>Giá</th>";
-            echo "<th>Số lượng</th>";
             echo "<th>Thành tiền</th>";
             echo "<th>Thời gian</th>";
             echo "<th>Trạng thái</th>";
@@ -414,15 +445,10 @@ function listRevenu($conn, $input_search, $date_from, $date_to, $pageChoose)
             echo "<tbody>";
 
             while ($row = mysqli_fetch_array($thuchien)) {
-                $gia = number_format($row['gia'], 0, '', '.') . " vnd";
                 $thanhtien = number_format($row['thanhtien'], 0, '', '.') . "vnd";
                 echo "<tr>";
                 echo "<td>" . $row['id'] . "</td>";
                 echo "<td>" . $row['taikhoan'] . "</td>";
-                echo "<td>" . (mb_strlen($row['tentruyen']) > 13 ? mb_substr($row['tentruyen'], 0, 13) . "..." : $row['tentruyen']) . "</td>";
-                echo "<td>" . (mb_strlen($row['taptruyen']) > 15 ? mb_substr($row['taptruyen'], 0, 15) . "..." : $row['taptruyen']) . "</td>";
-                echo "<td>" . $gia . "</td>";
-                echo "<td>" . $row['soluong'] . "</td>";
                 echo "<td>" . $thanhtien . "</td>";
                 echo "<td>" . $row['ngaymua'] . "</td>";
                 if ($row['trangthai'] == 1) {
@@ -439,6 +465,7 @@ function listRevenu($conn, $input_search, $date_from, $date_to, $pageChoose)
             echo "</table>";
 
             echo "<div class='pag'>";
+            echo "<button class='btn_pages' num_page='1'>First</button>";
             if (!$input_search && !$date_from && !$date_to) {
                 if ($page > 3) {
 
@@ -483,6 +510,7 @@ function listRevenu($conn, $input_search, $date_from, $date_to, $pageChoose)
                         echo "<button class='btn_pages' num_page='" . ($pageChoose + 1) . "'><i class='fa-solid fa-angles-right'></i></button>";
                     }
                 }
+                echo "<button class='btn_pages' num_page='$page'>Last</button>";
             }
             echo "</div>";
         } else {
@@ -650,6 +678,171 @@ function changeStatusProduct($conn, $idOfPro, $nameOfPro, $chapOfPro, $accOfPro,
         } else {
             echo " " . $conn->error;
         }
+    }
+}
+
+function buy($conn, $id_product)
+{
+    $truyvan = "SELECT * FROM danhsachtruyen WHERE id = $id_product";
+    $thuchien = mysqli_query($conn, $truyvan);
+
+    if ($thuchien) {
+        if (mysqli_num_rows($thuchien) > 0) {
+            while ($row = mysqli_fetch_array($thuchien)) {
+
+                $truyvan_checkgio = "SELECT * FROM giohang WHERE taikhoan = '$_SESSION[taikhoan]' AND tentruyen = '$row[ten]' AND taptruyen = '$row[taptruyen]'";
+                $thuchien_checkgio = mysqli_query($conn, $truyvan_checkgio);
+
+                if ($thuchien_checkgio) {
+                    if (mysqli_num_rows($thuchien_checkgio) > 0) {
+                        while ($row_update = mysqli_fetch_array($thuchien_checkgio)) {
+
+                            $update = "UPDATE giohang SET soluong = ($row_update[soluong] + 1) WHERE taikhoan = '$_SESSION[taikhoan]' AND tentruyen = '$row[ten]' AND taptruyen = '$row[taptruyen]'";
+                            $thuchien_update = mysqli_query($conn, $update);
+
+                            if ($thuchien_update) {
+                                header("Location: /project/LTWEB/CKI/html/danhmuc/buy.php?id=" . $row_update['id']);
+                            } else {
+                                echo "Không thể mua ngay";
+                            }
+                        }
+                    } else {
+                        // Đặt múi giờ là 'Asia/Ho_Chi_Minh' cho Việt Nam
+                        date_default_timezone_set('Asia/Ho_Chi_Minh');
+
+                        // Lấy ngày giờ hiện tại
+                        $currentDateTime = date('Y-m-d H:i:s');
+
+                        $add = "INSERT INTO giohang(taikhoan, tentruyen, taptruyen, hinhanh, soluong, gia, thanhtien, ngaythem) VALUES ('$_SESSION[taikhoan]', '$row[ten]', '$row[taptruyen]', '$row[hinhanh]', '1', '$row[gia]', '$row[gia]', '$currentDateTime')";
+                        $thuchien_add = mysqli_query($conn, $add);
+
+                        if ($thuchien_add) {
+
+                            $truyvan_getid = "SELECT * FROM giohang WHERE taikhoan = '$_SESSION[taikhoan]' AND tentruyen = '$row[ten]' AND taptruyen = '$row[taptruyen]'";
+                            $thuchien_getid = mysqli_query($conn, $truyvan_getid);
+
+                            if ($thuchien_getid) {
+                                while ($row_add = mysqli_fetch_array($thuchien_getid)) {
+                                    if ($row_add['tentruyen'] == $row['ten'] && $row_add['taptruyen'] == $row['taptruyen'] && $row_add['taikhoan'] == $_SESSION['taikhoan']) {
+                                        header("Location: /project/LTWEB/CKI/html/danhmuc/buy.php?id=" . $row_add['id']);
+                                    }
+                                }
+                            }
+                        } else {
+                            echo " " . $conn->error;
+                        }
+                    }
+                }
+            }
+        } else {
+            echo " " . $conn->error;
+        }
+    } else {
+        echo "Không thể mua ngay";
+    }
+}
+
+function thanhtoan($conn, $id_thanhtoan, $selectedText_City, $selectedText_Districts, $selectedText_Ward, $diachicuthe, $sdt, $radioValue, $tongcong)
+{
+    //Đặt múi giờ là 'Asia/Ho_Chi_Minh' cho Việt Nam
+    date_default_timezone_set('Asia/Ho_Chi_Minh');
+
+    //ngày hiện tại
+    $now = date('Y-m-d H:i:s');
+
+    //cập nhật lại thông tin trong taikhoan
+    $truyvan_update_user = "UPDATE taikhoan 
+                            SET sdt = '$sdt', diachi = '$diachicuthe',tinh = '$selectedText_City',huyen = '$selectedText_Districts',xa = '$selectedText_Ward'
+                            WHERE taikhoan = '$_SESSION[taikhoan]'";
+    $thuchien_update_user = mysqli_query($conn, $truyvan_update_user);
+
+    //kiểm tra cập nhật thông tin khách hàng thành công chưa
+    if ($thuchien_update_user) {
+
+        //kiểm tra đã có hóa đơn nào trong doanhthu chưa
+        $truyvan_select_max_idhd = "SELECT * FROM doanhthu ORDER BY ngaymua DESC LIMIT 1";
+        $thuchien_select_max_idhd = mysqli_query($conn, $truyvan_select_max_idhd);
+        if ($thuchien_select_max_idhd) {
+
+            $truyvan_insert = "INSERT INTO doanhthu(mahoadon, taikhoan, thanhtien, ngaymua, trangthai, phuongthucthanhtoan)";
+
+            if (mysqli_num_rows($thuchien_select_max_idhd) > 0) {
+                while ($row_select_max_idhd = mysqli_fetch_array($thuchien_select_max_idhd)) {
+                    $id_max = substr($row_select_max_idhd['mahoadon'], 2, null);
+
+                    $mahd = "hd" . ($id_max + 1);
+
+                    $truyvan_insert = $truyvan_insert . " VALUES('$mahd','$_SESSION[taikhoan]', '$tongcong', '$now', 0, '$radioValue')";
+                }
+            } else {
+                $mahd = "hd1";
+                $truyvan_insert = $truyvan_insert . " VALUES('$mahd','$_SESSION[taikhoan]', '$tongcong', '$now', 0, '$radioValue')";
+            }
+
+            $thuchien_insert = mysqli_query($conn, $truyvan_insert);
+
+            //thực hiện thêm hd mới vào doanhthu thành công thì thêm các sản phẩm được mua vào chitiethoadon
+            if ($thuchien_insert) {
+
+                $truyvan_insert_product_chitiethd = "SELECT * FROM giohang";
+
+                //kiếm tra nếu có id nghĩa là chỉ mua 1 sp
+                if ($id_thanhtoan) {
+                    //lấy thông tin từ dstruyen
+                    $truyvan_insert_product_chitiethd = $truyvan_insert_product_chitiethd . " WHERE taikhoan = '$_SESSION[taikhoan]' AND id = '$id_thanhtoan'";
+                } else {
+                    //không có id nên sẽ lấy toàn bộ truyện trong giỏ hàng
+                    $truyvan_insert_product_chitiethd = $truyvan_insert_product_chitiethd . " WHERE taikhoan = '$_SESSION[taikhoan]'";
+                }
+
+                $thuchien_insert_product_chitiethd = mysqli_query($conn, $truyvan_insert_product_chitiethd);
+
+                if ($thuchien_insert_product_chitiethd) {
+                    while ($row_insert_product_chitiethd = mysqli_fetch_array($thuchien_insert_product_chitiethd)) {
+
+                        $tongtien = $row_insert_product_chitiethd['soluong'] * $row_insert_product_chitiethd['gia'];
+
+                        $truyvan_insert_chitiethoadon = "INSERT INTO chitiethoadon(mahoadon, taikhoan, tentruyen, taptruyen, soluong, gia, tongtien, ngay) 
+                                                             VALUES('$mahd','$_SESSION[taikhoan]','$row_insert_product_chitiethd[tentruyen]','$row_insert_product_chitiethd[taptruyen]','$row_insert_product_chitiethd[soluong]','$row_insert_product_chitiethd[gia]','$tongtien','$now')";
+                        $thuchien_insert_chitiethoadon = mysqli_query($conn, $truyvan_insert_chitiethoadon);
+
+                        if ($thuchien_insert_chitiethoadon) {
+                            //xóa khỏi giỏ hàng
+                            $truyvan_xoasp_gio = "DELETE 
+                                                  FROM giohang 
+                                                  WHERE id = '$id_thanhtoan' AND tentruyen = '$row_insert_product_chitiethd[tentruyen]' AND taptruyen = '$row_insert_product_chitiethd[taptruyen]' AND taikhoan = '$_SESSION[taikhoan]'";
+                            $thuchien_xoasp_gio = mysqli_query($conn, $truyvan_xoasp_gio);
+
+                            //giảm số lượng tồn kho của sp trong danhsachtruyen
+                            $truyvan_giamsltk = "UPDATE danhsachtruyen 
+                                                 SET soluongtonkho = (soluongtonkho - $row_insert_product_chitiethd[soluong]) 
+                                                 WHERE ten = '$row_insert_product_chitiethd[tentruyen]' AND taptruyen = '$row_insert_product_chitiethd[taptruyen]'";
+                            $thuchien_giamsltk = mysqli_query($conn, $truyvan_giamsltk);
+
+                            //tăng số lượng đã bán của sp trong danhsachtruyen
+                            $truyvan_tangsltk = "UPDATE danhsachtruyen 
+                                                 SET soluongdaban = (soluongdaban + $row_insert_product_chitiethd[soluong]) 
+                                                 WHERE ten = '$row_insert_product_chitiethd[tentruyen]' AND taptruyen = '$row_insert_product_chitiethd[taptruyen]'";
+                            $thuchien_tangsltk = mysqli_query($conn, $truyvan_tangsltk);
+
+                            if ($thuchien_giamsltk && $thuchien_tangsltk && $thuchien_xoasp_gio) {
+                                echo "Đặt hàng thành công. Đơn hàng của bạn đang được chuẩn bị!";
+                            } else {
+                                echo "Mua hàng không thành công!";
+                            }
+                        } else {
+                            echo "Mua hàng không thành công!";
+                        }
+                    }
+                }
+
+
+            } else {
+                echo "Mua hàng không thành công!";
+            }
+        }
+    } else {
+        echo "Mua hàng không thành công!";
     }
 }
 

@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
     giohang_canhan.addEventListener('click', function () {
         for (let element of elements) {
             if (element.classList.contains('giohang')) {
-                window.location.href = '/project/LTWEB/CKI/html/giohang.php'
+                window.location.href = '/project/LTWEB/CKI/html/nguoidung/giohang.php'
             } else if (element.classList.contains('thongbao')) {
                 window.location.href = '/project/LTWEB/CKI/html/spdoiduyet/spdoiduyet.php'
             }
@@ -88,9 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 var productId = this.getAttribute("data-id-product");
                 var productName = this.getAttribute("data-ten-product");
                 var productChap = this.getAttribute("data-taptruyen-product");
-                console.log(productId);
-                console.log(productName);
-                console.log(productChap);
+                window.location.href = "/project/LTWEB/CKI/html/nguoidung/giohang.php?id="+productId;
             });
         });
     }

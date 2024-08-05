@@ -15,6 +15,7 @@ session_start();
 
     <!-- js -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/project/LTWEB/CKI/js/header.js"></script>
 </head>
 
 <body>
@@ -22,9 +23,6 @@ session_start();
     <?php
     include ("../form/header.php");
     ?>
-
-    <!-- Body -->
-
 
     <!-- Context -->
     <div id="context">

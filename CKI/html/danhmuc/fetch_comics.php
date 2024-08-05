@@ -87,6 +87,12 @@ function fetch_comics($conn, $brands_filter = null, $price_filter = null, $sort 
                 $buy_button_label = 'Mua hàng';
             }
 
+            // Cắt mô tả nếu dài hơn 100 ký tự
+            $description = htmlspecialchars($row['mota']);
+            if (strlen($description) > 200) {
+                $description = substr($description, 0, 200) . '...';
+            }
+
             echo "<a href='chitietsanpham.php?id=" . $row["id"] . "'>";
             echo '<div class="comic">';
             echo "<img src='/project/LTWEB/CKI/$row[hinhanh]'>";
@@ -98,9 +104,9 @@ function fetch_comics($conn, $brands_filter = null, $price_filter = null, $sort 
             echo '<p>Ngày phát hành: ' . htmlspecialchars($row["ngay"]) . '</p>';
             echo '<p>Số lượng: ' . htmlspecialchars($row["soluongtonkho"]) . '</p>';
             echo '<p>Lượt mua: ' . htmlspecialchars($row["soluongdaban"]) . '</p>';
-            echo '<p>Mô tả: ' . htmlspecialchars($row['mota']) . '</p>';
+            echo '<p>Mô tả: ' . $description . '</p>';
             echo '</a>'; // Đóng thẻ <a>
-            echo '<button class="buy-button"' . $buy_button_disabled . '>' . $buy_button_label . '</button>'; // Nút "Mua hàng"
+            echo '<a href="/project/LTWEB/CKI/html/api.php?action=buy&id='.$row["id"].'"><button class="buy-button"' . $buy_button_disabled . '>' . $buy_button_label . '</button></a>'; // Nút "Mua hàng"
             echo '<button class="cart-button">Thêm vào giỏ</button>'; // Nút "Thêm vào giỏ"
             echo '</div>';
             echo '</div>';
@@ -112,5 +118,3 @@ fetch_comics($conn, $brands_filter, $price_filter, $sort, $limit, $offset);
 
 $conn->close();
 ?>
-
-

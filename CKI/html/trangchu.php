@@ -17,7 +17,8 @@ session_start();
     <!-- js -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="/project/LTWEB/CKI/js/trangchu.js"></script>
-    <script src="/project/LTWEB/CKI/js/add_book.js"></script>
+    <script src="/project/LTWEB/CKI/js/header.js"></script>
+    <!-- <script src="/project/LTWEB/CKI/js/add_book.js"></script> -->
 
 </head>
 
@@ -134,8 +135,8 @@ session_start();
                 <div>
                     <div class="intro_img_dtvc"><img src="../img/logo/logo_grab.webp" alt=""></div>
                     <div class="content_dtvc">
-                        <p>Giao hàng trong ngày tại Tp Hồ Chí Minh. Đối tác vận chuyển tin cậy của shop. Công ty TNHH
-                            Grab. Địa chỉ: Thành phố Hồ Chí Minh, Việt Nam.</p>
+                        <p>Giao hàng trong ngày tại Tp Quy Nhơn. Đối tác vận chuyển tin cậy của shop. Công ty TNHH
+                            Grab. Địa chỉ: Thành phố Quy Nhơn, Việt Nam.</p>
                         <span>GRAB</span>
                     </div>
                 </div>

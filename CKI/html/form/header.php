@@ -29,7 +29,7 @@
                     <div id="tennguoidung"><?php echo $_SESSION['ten']; ?></div>
                     <?php if ($_SESSION['loai'] == 0) { ?>
                         <ul>
-                            <li><a href="/project/LTWEB/CKI/html/qltk/QLTK.php">Giỏ hàng</a></li>
+                            <li><a href="/project/LTWEB/CKI/html/nguoidung/giohang.php">Giỏ hàng</a></li>
                             <li><a href="/project/LTWEB/CKI/html/qltk/QLTK.php">Quản lý tài khoản</a></li>
                             <li><a href="/project/LTWEB/CKI/html/qlsp/QLSP.php">Quản lý sản phẩm</a></li>
                             <li><a href="/project/LTWEB/CKI/html/doanhthu/doanhthu.php">Quản lý doanh thu</a></li>
@@ -66,10 +66,10 @@
                         </div>
                         <div>
                             <div class="giohang">
-                                <span>Giỏ hàng (<?php echo $_SESSION['quantity_product'] ?>)</span>
+                                <span id="giohang"></span>
                             </div>
                             <div class="tiengiohong">
-                                <?php echo number_format($_SESSION['totalAmount'], 0, '', '.') . "vnđ" ?>
+                                <span id="tiengiohong"></span>
                             </div>
                         </div>
                     <?php } else { ?>
