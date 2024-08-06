@@ -69,6 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -108,7 +109,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             font-weight: bold;
         }
 
-        input[type="text"], input[type="password"] {
+        input[type="text"],
+        input[type="password"] {
             width: 95%;
             padding: 12px;
             margin-bottom: 0px;
@@ -150,13 +152,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         .button-group {
             display: flex;
-            gap: 100px; /* Giảm khoảng cách giữa các nút */
+            gap: 100px;
+            /* Giảm khoảng cách giữa các nút */
             margin-top: 20px;
         }
 
         .button-group button {
-            flex: 1; /* Các nút có cùng kích thước */
+            flex: 1;
+            /* Các nút có cùng kích thước */
         }
+
         .message {
             color: #721c24;
             /* background-color: #f8d7da;
@@ -194,9 +199,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h2>Đổi Mật Khẩu</h2>
+        <p id="message" class="message"></p>
         <form action="" method="POST" id="change-password-form">
             <div class="form-group">
                 <label for="username">Tài khoản</label>
@@ -227,14 +234,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <button type="button" onclick="window.history.back();">Quay lại</button>
                 <button type="submit">Đổi mật khẩu</button>
             </div>
-            <p id="message" class="message"></p>
         </form>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('.show-password').forEach(button => {
-                button.addEventListener('click', function() {
+                button.addEventListener('click', function () {
                     const targetInput = document.querySelector(this.dataset.target);
                     const type = targetInput.type === 'password' ? 'text' : 'password';
                     targetInput.type = type;
@@ -244,7 +250,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             });
 
             const form = document.getElementById('change-password-form');
-            form.addEventListener('submit', function(event) {
+            form.addEventListener('submit', function (event) {
                 event.preventDefault();
                 const username = document.getElementById('username').value;
                 const currentPassword = document.getElementById('current_password').value;
@@ -264,7 +270,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', '', true);
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhr.onload = function() {
+                xhr.onload = function () {
                     if (xhr.status === 200) {
                         messageElement.textContent = xhr.responseText;
                         messageElement.className = 'message success';
@@ -278,5 +284,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         });
     </script>
 </body>
-</html>
 
+</html>

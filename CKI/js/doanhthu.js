@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     dayOfMonth = Array(31).fill(0);
                 }
-
+                console.log(res.date[1])
                 if (res.month) {
                     monthOfYear = [];
                     for (var i = 0; i < res.month.length; i++) {
@@ -208,9 +208,9 @@ document.addEventListener('DOMContentLoaded', function () {
             var taptruyen = [];
 
             for (var i = 0; i < res.length; i++) {
-                xValues.push(res[i].tentruyen);
+                xValues.push(res[i].ten);
                 taptruyen.push(res[i].taptruyen);
-                yValues.push(res[i].totalQuantity);
+                yValues.push(res[i].soluongdaban);
             }
 
             new Chart(ctx, {

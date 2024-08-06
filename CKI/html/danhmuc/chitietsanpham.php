@@ -1,18 +1,19 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang chủ</title>
+    <title>Chi tiết sản phẩm</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/header.css">
-    <link rel="stylesheet" href="../css/footer.css">
+    <link rel="stylesheet" href="/project/LTWEB/CKI/css/style.css">
+    <link rel="stylesheet" href="/project/LTWEB/CKI/css/header.css">
+    <link rel="stylesheet" href="/project/LTWEB/CKI/css/footer.css">
 
-    <!-- js -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="../js/header_menuLeft.js"></script>
     <style>
         .product-wrapper {
             font-family: Arial, sans-serif;
@@ -184,7 +185,7 @@
             margin: 20px 0;
         }
 
-        p {
+        .p {
             font-size: 16px;
             line-height: 1.5;
             color: #333;
@@ -195,79 +196,81 @@
         }
     </style>
 </head>
+
 <body>
-<div>
-    <?php include("form/header.php"); ?>
-    <div class="breadcrumb">
-        <a href="#">TRANG CHỦ</a>
-        <a href="#">DANH MỤC</a>
-        <a href="#">CHI TIẾT SẢN PHẨM</a>
-    </div>
-    <div class="product-wrapper">
-        <div class="container">
-            <?php
-            // Kết nối cơ sở dữ liệu
-            $conn = new mysqli('localhost', 'root', '', 'webbansach');
+    <div>
+        <?php include ("../form/header.php"); ?>
+        <div class="breadcrumb">
+            <a href="#">TRANG CHỦ</a>
+            <a href="#">DANH MỤC</a>
+            <a href="#">CHI TIẾT SẢN PHẨM</a>
+        </div>
+        <div class="product-wrapper">
+            <div class="container">
+                <?php
+                // Kết nối cơ sở dữ liệu
+                $conn = new mysqli('localhost', 'root', '', 'webbansach');
 
-            if ($conn->connect_error) {
-                die("Kết nối thất bại: " . $conn->connect_error);
-            }
+                if ($conn->connect_error) {
+                    die("Kết nối thất bại: " . $conn->connect_error);
+                }
 
-            // Lấy ID sản phẩm từ URL
-            $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+                // Lấy ID sản phẩm từ URL
+                $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-            // Lấy thông tin sản phẩm
-            $query = "SELECT * FROM danhsachtruyen WHERE id = $id";
-            $result = $conn->query($query);
+                // Lấy thông tin sản phẩm
+                $query = "SELECT * FROM danhsachtruyen WHERE id = $id";
+                $result = $conn->query($query);
 
-            if ($result->num_rows > 0) {
-                $row = $result->fetch_assoc();
-                echo '<div class="left-column">';
-                echo '<img class="product-image" src="../' . $row['hinhanh'] . '" alt="' . htmlspecialchars($row['ten']) . '">';
-                echo '</div>';
-                echo '<div class="right-column">';
-                echo '<div class="product-details">';
-                echo '<h1>' . htmlspecialchars($row['ten']) . ' - Tập ' . htmlspecialchars($row["taptruyen"]) . '</h1>';
-                echo '<div style="display: flex; align-items: center;">';
-                echo '<p class="price">' . number_format($row['gia'], 0, ',', '.') . 'đ</p>';
-                echo '<div class="quantity">';
-                echo '<button onclick="decreaseQuantity()">-</button>';
-                echo '<input type="number" value="1" min="1" max="' . htmlspecialchars($row['soluongtonkho']) . '">';
-                echo '<button onclick="increaseQuantity()">+</button>';
-                echo '</div>';
-                echo '</div>';
-                echo '<div class="details-grid">';
-                echo '<p><strong>Thể loại:</strong> ' . htmlspecialchars($row['theloai']) . '</p>';
-                echo '<p><strong>Tác giả:</strong> ' . htmlspecialchars($row['tentacgia']) . '</p>';
-                echo '<p><strong>Dịch giả:</strong> ' . htmlspecialchars($row['dichgia']) . '</p>';
-                echo '<p><strong>Họa sĩ:</strong> ' . htmlspecialchars($row['hoasi']) . '</p>';
-                echo '<p><strong>Xuất xứ:</strong> ' . htmlspecialchars($row['xuatsu']) . '</p>';
-                echo '<p><strong>Series:</strong> ' . htmlspecialchars($row['series']) . '</p>';
-                echo '</div>';
-                echo '<div class="summary">';
-                echo '<p><strong>Tóm tắt nội dung:</strong> ' . htmlspecialchars($row['mota']) . '</p>';
-                echo '</div>';
+                if ($result->num_rows > 0) {
+                    $row = $result->fetch_assoc();
+                    echo '<div class="left-column">';
+                    echo '<img class="product-image" src="/project/LTWEB/CKI/' . $row['hinhanh'] . '" alt="' . htmlspecialchars($row['ten']) . '">';
+                    echo '</div>';
+                    echo '<div class="right-column">';
+                    echo '<div class="product-details">';
+                    echo '<h1>' . htmlspecialchars($row['ten']) . ' - ' . htmlspecialchars($row["taptruyen"]) . '</h1>';
+                    echo '<div style="display: flex; align-items: center;">';
+                    echo '<p class="price">' . number_format($row['gia'], 0, ',', '.') . 'đ</p>';
+                    echo '<div class="quantity">';
+                    echo '<button onclick="decreaseQuantity()">-</button>';
+                    echo '<input type="number" value="1" min="1" max="' . htmlspecialchars($row['soluongtonkho']) . '">';
+                    echo '<button onclick="increaseQuantity()">+</button>';
+                    echo '</div>';
+                    echo '</div>';
+                    echo '<div class="details-grid">';
+                    echo '<p class="p"><strong>Thể loại:</strong> ' . htmlspecialchars($row['theloai']) . '</p>';
+                    echo '<p class="p"><strong>Tác giả:</strong> ' . htmlspecialchars($row['tentacgia']) . '</p>';
+                    echo '<p class="p"><strong>Dịch giả:</strong> ' . htmlspecialchars($row['dichgia']) . '</p>';
+                    echo '<p class="p"><strong>Họa sĩ:</strong> ' . htmlspecialchars($row['hoasi']) . '</p>';
+                    echo '<p class="p"><strong>Xuất xứ:</strong> ' . htmlspecialchars($row['xuatsu']) . '</p>';
+                    echo '<p class="p"><strong>Series:</strong> ' . htmlspecialchars($row['series']) . '</p>';
+                    echo '</div>';
+                    echo '<div class="summary">';
+                    echo '<p class="p"><strong>Tóm tắt nội dung:</strong> ' . htmlspecialchars($row['mota']) . '</p>';
+                    echo '</div>';
 
-                $buy_button_disabled = $row["soluongtonkho"] <= 0 ? ' disabled' : '';
-                $buy_button_class = $row["soluongtonkho"] <= 0 ? 'btn disabled' : 'btn';
-                $add_to_cart_button_class = $row["soluongtonkho"] <= 0 ? 'btn disabled add-to-cart' : 'btn add-to-cart';
+                    $buy_button_disabled = $row["soluongtonkho"] <= 0 ? ' disabled' : '';
+                    $buy_button_class = $row["soluongtonkho"] <= 0 ? 'btn disabled' : 'btn';
+                    $add_to_cart_button_class = $row["soluongtonkho"] <= 0 ? 'btn disabled add-to-cart' : 'btn add-to-cart';
 
-                echo '<div class="btn-container">';
-                echo '<a href="#" class="' . $add_to_cart_button_class . '"' . $buy_button_disabled . '>Thêm vào giỏ</a>';
-                echo '<a href="#" class="' . $buy_button_class . '"' . $buy_button_disabled . '>Mua ngay</a>';
-                echo '</div>';
-                echo '</div>';
-                echo '</div>';
-            } else {
-                echo "<p>Không tìm thấy sản phẩm.</p>";
-            }
+                    echo '<div class="btn-container">';
+                    echo '<a href="#" class="' . $add_to_cart_button_class . '"' . $buy_button_disabled . '>Thêm vào giỏ</a>';
+                    echo '<a href="#" class="' . $buy_button_class . '"' . $buy_button_disabled . '>Mua ngay</a>';
+                    echo '</div>';
+                    echo '</div>';
+                    echo '</div>';
+                } else {
+                    echo "<p>Không tìm thấy sản phẩm.</p>";
+                }
 
-            $conn->close();
-            ?>
+                $conn->close();
+                ?>
+            </div>
         </div>
     </div>
-</div>
-    <?php include("form/footer.php"); ?>
+    
+    <?php include ("../form/footer.php"); ?>
 
     <script>
         function decreaseQuantity() {
@@ -284,4 +287,5 @@
     </script>
 
 </body>
+
 </html>

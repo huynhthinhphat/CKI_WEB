@@ -95,7 +95,7 @@ while ($row = mysqli_fetch_array($thuchien_diachi)) {
                     </div>
                 </div>
                 <div>
-                    <a href="/project/LTWEB/CKI/html/nguoidung/giohang.php">Giỏ hàng</a>
+                    <a href="/project/LTWEB/CKI/html/danhmuc/danhmuc.php">Tiếp tục mua sắm</a>
                     <?php
                     $truyvan = "SELECT * FROM giohang WHERE taikhoan = '$_SESSION[taikhoan]'";
                     $thuchien = mysqli_query($conn, $truyvan);

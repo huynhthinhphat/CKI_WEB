@@ -47,12 +47,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 dialog_spdoiduyet.classList.add('show');
 
-                var idOfPro = this.getAttribute('id');
-                var nameOfPro = this.getAttribute('tentruyen');
-                var chapOfPro = this.getAttribute('taptruyen');
+                var idOfPro = this.getAttribute('data-mahd');
                 var accOfPro = this.getAttribute('taikhoan');
 
-                var text = "Bạn muốn duyệt đơn hàng " + nameOfPro + " " + chapOfPro + " của tài khoản " + accOfPro + "?";
+                var text = "Bạn muốn duyệt đơn hàng có mã hóa đơn "+ idOfPro + " của tài khoản " + accOfPro + "?";
 
                 title_dialog_spdoiduyet.innerHTML = text;
 
@@ -60,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     $.ajax({
                         url: '/project/LTWEB/CKI/html/api.php?action=changeStatusProduct',
                         method: 'post',
-                        data: { idOfPro: idOfPro, nameOfPro: nameOfPro, chapOfPro: chapOfPro, accOfPro: accOfPro, pbiet: "duyet" },
+                        data: { idOfPro: idOfPro, accOfPro: accOfPro, pbiet: "duyet" },
                         success: function (res) {
                             if (res == "ok") {
                                 dialog_spdoiduyet.classList.remove('show');
@@ -118,12 +116,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 dialog_spdoiduyet.classList.add('show');
 
-                var idOfPro = this.getAttribute('id');
-                var nameOfPro = this.getAttribute('tentruyen');
-                var chapOfPro = this.getAttribute('taptruyen');
+                var idOfPro = this.getAttribute('data-mahd');
                 var accOfPro = this.getAttribute('taikhoan');
 
-                var text = "Bạn muốn hủy đơn hàng " + nameOfPro + " " + chapOfPro + " của tài khoản " + accOfPro + "?";
+                var text = "Bạn muốn hủy đơn hàng có mã hóa đơn "+ idOfPro + " của tài khoản " + accOfPro + "?";
 
                 title_dialog_spdoiduyet.innerHTML = text;
 
@@ -131,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     $.ajax({
                         url: '/project/LTWEB/CKI/html/api.php?action=changeStatusProduct',
                         method: 'post',
-                        data: { idOfPro: idOfPro, nameOfPro: nameOfPro, chapOfPro: chapOfPro, accOfPro: accOfPro, pbiet: "huy" },
+                        data: { idOfPro: idOfPro, accOfPro: accOfPro, pbiet: "huy" },
                         success: function (res) {
                             if (res == "ok") {
                                 dialog_spdoiduyet.classList.remove('show');

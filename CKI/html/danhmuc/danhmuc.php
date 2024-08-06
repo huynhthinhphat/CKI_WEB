@@ -15,7 +15,8 @@ session_start();
 
     <!-- js -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="/project/LTWEB/CKI/js/header_menuLeft.js"></script>
+    <script src="/project/LTWEB/CKI/js/trangchu.js"></script>
+    <script src="/project/LTWEB/CKI/js/header.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;

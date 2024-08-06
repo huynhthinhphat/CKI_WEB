@@ -33,7 +33,7 @@
                             <li><a href="/project/LTWEB/CKI/html/qltk/QLTK.php">Quản lý tài khoản</a></li>
                             <li><a href="/project/LTWEB/CKI/html/qlsp/QLSP.php">Quản lý sản phẩm</a></li>
                             <li><a href="/project/LTWEB/CKI/html/doanhthu/doanhthu.php">Quản lý doanh thu</a></li>
-                            <li><a href="#">Đổi mật khẩu</a></li>
+                            <li><a href="/project/LTWEB/CKI/html/nguoidung/doimatkhau.php">Đổi mật khẩu</a></li>
                             <li><a href="/project/LTWEB/CKI/html/api.php?action=logout">Đăng xuất</a></li>
                         </ul>
                     <?php } else { ?>
@@ -86,11 +86,10 @@
     </div>
 </header>
 <nav>
-    <li><a href="/project/LTWEB/CKI/html/danhmuc/danhmuc.php">Danh mục</a></li>
-    <li><a href="#">Danh mục</a></li>
-    <li><a href="#">Danh mục</a></li>
-    <li><a href="#">Danh mục</a></li>
-    <li><a href="#">Danh mục</a></li>
+    <li><a href="/project/LTWEB/CKI/html/danhmuc/danhmuc.php">DANH MỤC</a></li>
+    <li><a href="#">HƯỚNG DẪN CẦN BIẾT</a></li>
+    <li><a href="#">VỀ CHÚNG TÔI</a></li>
+    <li><a href="https://chat.zalo.me/?phone=0375204558">LIÊN HỆ</a></li>
 </nav>
 
 <!-- button kéo lên đầu trang -->

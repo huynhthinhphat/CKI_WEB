@@ -28,15 +28,13 @@ $date_from = isset($_POST['date_from']) ? $_POST['date_from'] : '';
 $date_to = isset($_POST['date_to']) ? $_POST['date_to'] : '';
 
 //trang được chọn
-$pageChoose = isset($_POST['pageChoose']) ? $_POST['pageChoose'] : '';
-$pageChoose_iw = isset($_POST['pageChoose_iw']) ? $_POST['pageChoose_iw'] : '';
-$pageChoose_sph = isset($_POST['pageChoose_sph']) ? $_POST['pageChoose_sph'] : '';
+$pageChoose = isset($_POST['pageChoose']) ? $_POST['pageChoose'] : 1;
+$pageChoose_iw = isset($_POST['pageChoose_iw']) ? $_POST['pageChoose_iw'] : 1;
+$pageChoose_sph = isset($_POST['pageChoose_sph']) ? $_POST['pageChoose_sph'] : 1;
 
 //biến thông tin chuyển trạng thái
 $pbiet = isset($_POST['pbiet']) ? $_POST['pbiet'] : '';
 $idOfPro = isset($_POST['idOfPro']) ? $_POST['idOfPro'] : '';
-$nameOfPro = isset($_POST['nameOfPro']) ? $_POST['nameOfPro'] : '';
-$chapOfPro = isset($_POST['chapOfPro']) ? $_POST['chapOfPro'] : '';
 $accOfPro = isset($_POST['accOfPro']) ? $_POST['accOfPro'] : '';
 
 //biến nhận được khi mua ngay
@@ -78,7 +76,7 @@ switch ($action) {
         spdoiduyet($conn);
         break;
     case 'changeStatusProduct':
-        changeStatusProduct($conn, $idOfPro, $nameOfPro, $chapOfPro, $accOfPro, $pbiet);
+        changeStatusProduct($conn, $idOfPro, $accOfPro, $pbiet);
         break;
     case 'quantity_tb':
         quantity_tb($conn);
@@ -394,7 +392,7 @@ function listRevenu($conn, $input_search, $date_from, $date_to, $pageChoose)
 
     if ($input_search || $date_from || $date_to) {
 
-        $truyvan_end = " WHERE (taikhoan like '%$input_search%' '$input_search' = '') AND (ngaymua >= '$date_from' OR '$date_from' = '') AND (ngaymua <= '$date_to' OR '$date_to' = '')";
+        $truyvan_end = " WHERE (taikhoan like '%$input_search%' OR mahoadon = '$input_search' OR '$input_search' = '') AND (ngaymua >= '$date_from' OR '$date_from' = '') AND (ngaymua <= '$date_to' OR '$date_to' = '')";
 
         $truyvan = $truyvan . $truyvan_end;
         $truyvan_totalAmount = "SELECT SUM(thanhtien) AS thanhtien FROM doanhthu" . $truyvan_end;
@@ -436,9 +434,12 @@ function listRevenu($conn, $input_search, $date_from, $date_to, $pageChoose)
             echo "<thead>";
             echo "<tr>";
             echo "<th>STT</th>";
+            echo "<th>Mã hóa đơn</th>";
             echo "<th>Tài khoản</th>";
             echo "<th>Thành tiền</th>";
             echo "<th>Thời gian</th>";
+            echo "<th>Phương thức thanh toán</th>";
+            echo "<th>Chi tiết</th>";
             echo "<th>Trạng thái</th>";
             echo "</tr>";
             echo "</thead>";
@@ -448,9 +449,12 @@ function listRevenu($conn, $input_search, $date_from, $date_to, $pageChoose)
                 $thanhtien = number_format($row['thanhtien'], 0, '', '.') . "vnd";
                 echo "<tr>";
                 echo "<td>" . $row['id'] . "</td>";
+                echo "<td>" . $row['mahoadon'] . "</td>";
                 echo "<td>" . $row['taikhoan'] . "</td>";
                 echo "<td>" . $thanhtien . "</td>";
                 echo "<td>" . $row['ngaymua'] . "</td>";
+                echo "<td>" . $row['phuongthucthanhtoan'] . "</td>";
+                echo "<td><a href='xemchitiet.php?mahoadon=".$row['mahoadon']."'>Xem chi tiết</a></td>";
                 if ($row['trangthai'] == 1) {
                     echo "<td><i style='color: white; background-color: green; padding: 2% 2.5%; border-radius: 50%' class='fa-solid fa-check'></i></td>";
                 } else if ($row['trangthai'] == 2) {
@@ -465,7 +469,6 @@ function listRevenu($conn, $input_search, $date_from, $date_to, $pageChoose)
             echo "</table>";
 
             echo "<div class='pag'>";
-            echo "<button class='btn_pages' num_page='1'>First</button>";
             if (!$input_search && !$date_from && !$date_to) {
                 if ($page > 3) {
 
@@ -482,6 +485,7 @@ function listRevenu($conn, $input_search, $date_from, $date_to, $pageChoose)
                         $end = $page;
                         $begin = $page - 2;
                     }
+                    echo "<button class='btn_pages' num_page='1'>First</button>";
 
                     //pre
                     if ($pageChoose > 1) {
@@ -496,7 +500,13 @@ function listRevenu($conn, $input_search, $date_from, $date_to, $pageChoose)
                     if ($pageChoose < $end) {
                         echo "<button class='btn_pages' num_page='" . ($pageChoose + 1) . "'><i class='fa-solid fa-angles-right'></i></button>";
                     }
+
+                    echo "<button class='btn_pages' num_page='$page'>Last</button>";
+
                 } else if (1 < $page && $page <= 5) {
+
+                    echo "<button class='btn_pages' num_page='1'>First</button>";
+
                     if ($pageChoose > 1) {
                         echo "<button class='btn_pages' num_page='" . ($pageChoose - 1) . "'><i class='fa-solid fa-angles-left'></i></button>";
                     }
@@ -509,8 +519,9 @@ function listRevenu($conn, $input_search, $date_from, $date_to, $pageChoose)
                     if ($pageChoose < $page) {
                         echo "<button class='btn_pages' num_page='" . ($pageChoose + 1) . "'><i class='fa-solid fa-angles-right'></i></button>";
                     }
+
+                    echo "<button class='btn_pages' num_page='$page'>Last</button>";
                 }
-                echo "<button class='btn_pages' num_page='$page'>Last</button>";
             }
             echo "</div>";
         } else {
@@ -523,6 +534,8 @@ function listRevenu($conn, $input_search, $date_from, $date_to, $pageChoose)
 
 function getInforFromDT($conn)
 {
+    header('Content-Type: application/json');
+    $data = [];
     //ngày tháng năm hiện tại
     $currentDate = date('Y-m-d');
 
@@ -556,40 +569,40 @@ function getInforFromDT($conn)
     $thuchien_month = mysqli_query($conn, $truyvan_month);
 
     //lấy số lượng bán được của truyện
-    $truyvan_bestsell = "SELECT SUM(soluong) AS totalQuantity, tentruyen, taptruyen
-                         FROM doanhthu 
-                         WHERE trangthai = 1
-                         GROUP BY tentruyen, taptruyen 
-                         ORDER BY totalQuantity DESC 
+    $truyvan_bestsell = "SELECT ten, taptruyen, soluongdaban
+                         FROM danhsachtruyen
+                         WHERE soluongdaban > 0
+                         ORDER BY soluongdaban DESC
                          LIMIT 10";
-
     $thuchien_bestsell = mysqli_query($conn, $truyvan_bestsell);
 
     if ($thuchien_time && mysqli_num_rows($thuchien_time) > 0) {
-        while ($row = mysqli_fetch_array($thuchien_time)) {
+        while ($row = mysqli_fetch_assoc($thuchien_time)) {
             $data['time'][] = $row;
         }
     }
 
     if ($thuchien_date && mysqli_num_rows($thuchien_date) > 0) {
-        while ($row = mysqli_fetch_array($thuchien_date)) {
+        while ($row = mysqli_fetch_assoc($thuchien_date)) {
             $data['date'][] = $row;
         }
     }
 
     if ($thuchien_month && mysqli_num_rows($thuchien_month) > 0) {
-        while ($row = mysqli_fetch_array($thuchien_month)) {
+        while ($row = mysqli_fetch_assoc($thuchien_month)) {
             $data['month'][] = $row;
         }
     }
 
     if ($thuchien_bestsell && mysqli_num_rows($thuchien_bestsell) > 0) {
-        while ($row = mysqli_fetch_array($thuchien_bestsell)) {
+        while ($row = mysqli_fetch_assoc($thuchien_bestsell)) {
             $data['quantity_product'][] = $row;
         }
+    } else {
+        // Nếu không có kết quả, hãy kiểm tra
+        $data['quantity_product'] = 'Không có dữ liệu';
     }
 
-    header('Content-Type: application/json');
     echo json_encode($data);
 }
 
@@ -615,11 +628,8 @@ function spdoiduyet($conn)
         echo "<thead>";
         echo "<tr>";
         echo "<th>STT</th>";
+        echo "<th>Mã hóa đơn</th>";
         echo "<th>Tài khoản</th>";
-        echo "<th>Tên truyện</th>";
-        echo "<th>Tập truyện</th>";
-        echo "<th>Giá</th>";
-        echo "<th>Số lượng</th>";
         echo "<th>Thành tiền</th>";
         echo "<th>Thời gian</th>";
         echo "<th>Trạng thái</th>";
@@ -632,22 +642,18 @@ function spdoiduyet($conn)
 
         while ($row = mysqli_fetch_array($thuchien)) {
             $stt = $i++;
-            $gia = number_format($row['gia'], 0, '', '.') . " vnd";
             $thanhtien = number_format($row['thanhtien'], 0, '', '.') . "vnd";
             echo "<tr>";
             echo "<td>$stt</td>";
+            echo "<td>" . $row['mahoadon'] . "</td>";
             echo "<td>" . $row['taikhoan'] . "</td>";
-            echo "<td>" . (mb_strlen($row['tentruyen']) > 13 ? mb_substr($row['tentruyen'], 0, 13) . "..." : $row['tentruyen']) . "</td>";
-            echo "<td>" . (mb_strlen($row['taptruyen']) > 15 ? mb_substr($row['taptruyen'], 0, 15) . "..." : $row['taptruyen']) . "</td>";
-            echo "<td>" . $gia . "</td>";
-            echo "<td>" . $row['soluong'] . "</td>";
             echo "<td>" . $thanhtien . "</td>";
             echo "<td>" . $row['ngaymua'] . "</td>";
             echo "<td>Chờ duyệt</td>";
             echo "<td>
-            <button class='btn_choduyet' id='$row[id]' tentruyen='$row[tentruyen]' taptruyen='$row[taptruyen]' taikhoan='$row[taikhoan]'>Duyệt</button>
+            <button class='btn_choduyet' data-mahd='$row[mahoadon]' taikhoan='$row[taikhoan]'>Duyệt</button>
             |
-            <button class='btn_huydon' id='$row[id]' tentruyen='$row[tentruyen]' taptruyen='$row[taptruyen]' taikhoan='$row[taikhoan]'>Xóa</button>
+            <button class='btn_huydon' data-mahd='$row[mahoadon]' taikhoan='$row[taikhoan]'>Xóa</button>
             </td>";
             echo "</tr>";
         }
@@ -660,20 +666,56 @@ function spdoiduyet($conn)
     }
 }
 
-function changeStatusProduct($conn, $idOfPro, $nameOfPro, $chapOfPro, $accOfPro, $pbiet)
+function changeStatusProduct($conn, $idOfPro, $accOfPro, $pbiet)
 {
     if ($pbiet == "duyet") {
-        $truyvan = "UPDATE doanhthu SET trangthai = 1 WHERE id = '$idOfPro' AND taikhoan = '$accOfPro' AND tentruyen = '$nameOfPro' AND taptruyen = '$chapOfPro'";
+        $truyvan = "UPDATE doanhthu SET trangthai = 1 WHERE mahoadon = '$idOfPro' AND taikhoan = '$accOfPro'";
         $thuchien = mysqli_query($conn, $truyvan);
+
         if ($thuchien) {
+
+            //lấy các sp trong chitiethoadon cùng mahoadon với hóa đơn trong doanhthu để update sl tồn kho và đã bán trong danhsachtruyen
+            $truyvan_select_flo_mahd = "SELECT * FROM chitiethoadon WHERE mahoadon = '$idOfPro' AND taikhoan = '$accOfPro'";
+            $thuchien_select_flo_mahd = mysqli_query($conn, $truyvan_select_flo_mahd);
+
+            if ($thuchien_select_flo_mahd) {
+                while ($row_select_flo_mahd = mysqli_fetch_array($thuchien_select_flo_mahd)) {
+
+                    //giảm số lượng tồn kho của sp trong danhsachtruyen
+                    $truyvan_giamsltk = "UPDATE danhsachtruyen 
+                                         SET soluongtonkho = (soluongtonkho - $row_select_flo_mahd[soluong]) 
+                                         WHERE ten = '$row_select_flo_mahd[tentruyen]' AND taptruyen = '$row_select_flo_mahd[taptruyen]'";
+                    $thuchien_giamsltk = mysqli_query($conn, $truyvan_giamsltk);
+
+                    //tăng số lượng đã bán của sp trong danhsachtruyen
+                    $truyvan_tangsltk = "UPDATE danhsachtruyen 
+                                         SET soluongdaban = (soluongdaban + $row_select_flo_mahd[soluong]) 
+                                         WHERE ten = '$row_select_flo_mahd[tentruyen]' AND taptruyen = '$row_select_flo_mahd[taptruyen]'";
+                    $thuchien_tangsltk = mysqli_query($conn, $truyvan_tangsltk);
+                }
+            }
+
             echo "ok";
         } else {
             echo " " . $conn->error;
         }
     } else if ($pbiet == "huy") {
-        $truyvan = "UPDATE doanhthu SET trangthai = 2 WHERE id = '$idOfPro' AND taikhoan = '$accOfPro' AND tentruyen = '$nameOfPro' AND taptruyen = '$chapOfPro'";
+        $truyvan = "UPDATE doanhthu SET trangthai = 2 WHERE mahoadon = '$idOfPro' AND taikhoan = '$accOfPro'";
         $thuchien = mysqli_query($conn, $truyvan);
+
         if ($thuchien) {
+
+            $truyvan_get_pro_to_del = "SELECT * FROM chitiethoadon WHERE mahoadon = '$idOfPro' AND taikhoan = '$accOfPro'";
+            $thuchien_get_pro_to_dell = mysqli_query($conn, $truyvan_get_pro_to_del);
+
+            if ($thuchien_get_pro_to_dell) {
+                while ($row_get_pro_to_dell = mysqli_fetch_array($thuchien_get_pro_to_dell)) {
+                    //nếu hủy thì sẽ xóa các sp trong chitietgiohang
+                    $truyvan_del = "DELETE FROM chitiethoadon WHERE mahoadon = '$idOfPro'";
+                    $thuchien_del = mysqli_query($conn, $truyvan_del);
+                }
+            }
+
             echo "ok";
         } else {
             echo " " . $conn->error;
@@ -807,42 +849,38 @@ function thanhtoan($conn, $id_thanhtoan, $selectedText_City, $selectedText_Distr
                         $thuchien_insert_chitiethoadon = mysqli_query($conn, $truyvan_insert_chitiethoadon);
 
                         if ($thuchien_insert_chitiethoadon) {
+
                             //xóa khỏi giỏ hàng
-                            $truyvan_xoasp_gio = "DELETE 
-                                                  FROM giohang 
-                                                  WHERE id = '$id_thanhtoan' AND tentruyen = '$row_insert_product_chitiethd[tentruyen]' AND taptruyen = '$row_insert_product_chitiethd[taptruyen]' AND taikhoan = '$_SESSION[taikhoan]'";
+                            $truyvan_xoasp_gio = "DELETE FROM giohang";
+                            if ($id_thanhtoan) {
+                                $truyvan_xoasp_gio = $truyvan_xoasp_gio . " WHERE id = '$id_thanhtoan' AND tentruyen = '$row_insert_product_chitiethd[tentruyen]' AND taptruyen = '$row_insert_product_chitiethd[taptruyen]' AND taikhoan = '$_SESSION[taikhoan]'";
+                            } else {
+                                $truyvan_xoasp_gio = $truyvan_xoasp_gio . " WHERE tentruyen = '$row_insert_product_chitiethd[tentruyen]' AND taptruyen = '$row_insert_product_chitiethd[taptruyen]' AND taikhoan = '$_SESSION[taikhoan]'";
+                            }
                             $thuchien_xoasp_gio = mysqli_query($conn, $truyvan_xoasp_gio);
 
-                            //giảm số lượng tồn kho của sp trong danhsachtruyen
-                            $truyvan_giamsltk = "UPDATE danhsachtruyen 
-                                                 SET soluongtonkho = (soluongtonkho - $row_insert_product_chitiethd[soluong]) 
-                                                 WHERE ten = '$row_insert_product_chitiethd[tentruyen]' AND taptruyen = '$row_insert_product_chitiethd[taptruyen]'";
-                            $thuchien_giamsltk = mysqli_query($conn, $truyvan_giamsltk);
-
-                            //tăng số lượng đã bán của sp trong danhsachtruyen
-                            $truyvan_tangsltk = "UPDATE danhsachtruyen 
-                                                 SET soluongdaban = (soluongdaban + $row_insert_product_chitiethd[soluong]) 
-                                                 WHERE ten = '$row_insert_product_chitiethd[tentruyen]' AND taptruyen = '$row_insert_product_chitiethd[taptruyen]'";
-                            $thuchien_tangsltk = mysqli_query($conn, $truyvan_tangsltk);
-
-                            if ($thuchien_giamsltk && $thuchien_tangsltk && $thuchien_xoasp_gio) {
-                                echo "Đặt hàng thành công. Đơn hàng của bạn đang được chuẩn bị!";
+                            if ($thuchien_xoasp_gio) {
+                                $tb = "1";
                             } else {
-                                echo "Mua hàng không thành công!";
+                                $tb = "2";
                             }
                         } else {
-                            echo "Mua hàng không thành công!";
+                            $tb = "2";
                         }
                     }
                 }
-
-
             } else {
-                echo "Mua hàng không thành công!";
+                $tb = "2";
             }
         }
     } else {
-        echo "Mua hàng không thành công!";
+        $tb = "2";
+    }
+
+    if ($tb == "1") {
+        echo "Đặt hàng thành công. Đơn hàng của bạn đang được chuẩn bị!";
+    } else {
+        echo "Mua hàng thất bại!";
     }
 }
 
