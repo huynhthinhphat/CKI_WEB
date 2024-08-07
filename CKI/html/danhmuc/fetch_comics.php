@@ -1,4 +1,5 @@
 <?php
+session_start();
 // Kết nối tới cơ sở dữ liệu
 $conn = new mysqli('localhost', 'root', '', 'webbansach');
 
@@ -13,7 +14,8 @@ $sort = isset($_GET['sort']) ? $_GET['sort'] : 'moinhat'; // Mặc định sắp
 $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 5; // Giới hạn số lượng truyện hiển thị mặc định là 8
 $offset = isset($_GET['offset']) ? intval($_GET['offset']) : 0; // Vị trí bắt đầu lấy truyện
 
-function fetch_comics($conn, $brands_filter = null, $price_filter = null, $sort = 'moinhat', $limit = 8, $offset = 0) {
+function fetch_comics($conn, $brands_filter = null, $price_filter = null, $sort = 'moinhat', $limit = 8, $offset = 0)
+{
     $query = "SELECT * FROM danhsachtruyen";
     $conditions = [];
 
@@ -106,8 +108,15 @@ function fetch_comics($conn, $brands_filter = null, $price_filter = null, $sort 
             echo '<p>Lượt mua: ' . htmlspecialchars($row["soluongdaban"]) . '</p>';
             echo '<p>Mô tả: ' . $description . '</p>';
             echo '</a>'; // Đóng thẻ <a>
-            echo '<a href="/project/LTWEB/CKI/html/api.php?action=buy&id='.$row["id"].'"><button class="buy-button"' . $buy_button_disabled . '>' . $buy_button_label . '</button></a>'; // Nút "Mua hàng"
-            echo '<button class="cart-button">Thêm vào giỏ</button>'; // Nút "Thêm vào giỏ"
+            if (isset($_SESSION['taikhoan'])) {
+                if ($_SESSION['loai'] != 0) {
+                    echo '<a href="/project/LTWEB/CKI/html/api.php?action=buy&id=' . $row["id"] . '"><button class="buy-button"' . $buy_button_disabled . '>' . $buy_button_label . '</button></a>'; // Nút "Mua hàng"
+                    echo '<a href="/project/LTWEB/CKI/html/nguoidung/giohang.php?id=' . $row["id"] . '"><button class="cart-button">Thêm vào giỏ</button></a>'; // Nút "Thêm vào giỏ"
+                }
+            } else {
+                echo '<a href="/project/LTWEB/CKI/html/api.php?action=buy&id=' . $row["id"] . '"><button class="buy-button"' . $buy_button_disabled . '>' . $buy_button_label . '</button></a>'; // Nút "Mua hàng"
+                echo '<a href="/project/LTWEB/CKI/html/nguoidung/giohang.php?id=' . $row["id"] . '"><button class="cart-button">Thêm vào giỏ</button></a>'; // Nút "Thêm vào giỏ"
+            }
             echo '</div>';
             echo '</div>';
         }

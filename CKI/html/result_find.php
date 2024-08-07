@@ -16,9 +16,11 @@ $search = isset($_GET["header_search"]) ? $_GET["header_search"] : "";
     <link rel="stylesheet" href="/project/LTWEB/CKI/css/style.css">
     <link rel="stylesheet" href="/project/LTWEB/CKI/css/header.css">
     <link rel="stylesheet" href="/project/LTWEB/CKI/css/footer.css">
-
+    <link rel="icon" href="/project/LTWEB/CKI/img/logo/logo.jpg" type="image/jpg">
     <!-- js -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/project/LTWEB/CKI/js/trangchu.js"></script>
+    <script src="/project/LTWEB/CKI/js/header.js"></script>
 </head>
 
 <body>
@@ -47,14 +49,14 @@ $search = isset($_GET["header_search"]) ? $_GET["header_search"] : "";
 
                         echo "<div id-product='$row[id]' class='item_book'>";
                         echo "<div class='name_book'>";
-                        echo "<p>$ten $taptruyen</p>";
+                        echo "<a href='/project/LTWEB/CKI/html/danhmuc/chitietsanpham.php?id=" . $row['id'] . "'><p>$ten $taptruyen</p></a>";
                         echo "<p>$gia</p>";
                         echo "</div>";
                         echo "<div class='img_book'>";
                         echo "<img src='../$hinhanh'>";
                         echo "</div>";
                         echo "<div class='add_book'>";
-                        echo "<button class='btn_themgiohang' id-product='$row[id]'>THÊM VÀO GIỎ</button>";
+                        echo "<button class='btn_themgiohang' data-id-product='$row[id]'>THÊM VÀO GIỎ</button>";
                         echo "</div>";
                         echo "</div>";
                     }

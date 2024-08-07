@@ -1,6 +1,6 @@
 <header id="header">
     <div>
-        <a href="/project/LTWEB/CKI/html/trangchu.php"><img src="/project/LTWEB/CKI/img/logo/anhnen_trangchu.jpg"
+        <a href="/project/LTWEB/CKI/html/trangchu.php"><img src="/project/LTWEB/CKI/img/logo/logo.jpg"
                 alt="Ảnh logo"></a>
     </div>
     <div>
@@ -29,7 +29,7 @@
                     <div id="tennguoidung"><?php echo $_SESSION['ten']; ?></div>
                     <?php if ($_SESSION['loai'] == 0) { ?>
                         <ul>
-                            <li><a href="/project/LTWEB/CKI/html/nguoidung/giohang.php">Giỏ hàng</a></li>
+                            <!-- <li><a href="/project/LTWEB/CKI/html/nguoidung/giohang.php">Giỏ hàng</a></li> -->
                             <li><a href="/project/LTWEB/CKI/html/qltk/QLTK.php">Quản lý tài khoản</a></li>
                             <li><a href="/project/LTWEB/CKI/html/qlsp/QLSP.php">Quản lý sản phẩm</a></li>
                             <li><a href="/project/LTWEB/CKI/html/doanhthu/doanhthu.php">Quản lý doanh thu</a></li>
@@ -87,8 +87,7 @@
 </header>
 <nav>
     <li><a href="/project/LTWEB/CKI/html/danhmuc/danhmuc.php">DANH MỤC</a></li>
-    <li><a href="#">HƯỚNG DẪN CẦN BIẾT</a></li>
-    <li><a href="#">VỀ CHÚNG TÔI</a></li>
+    <li><a href="/project/LTWEB/CKI/html/vechungtoi.php">VỀ CHÚNG TÔI</a></li>
     <li><a href="https://chat.zalo.me/?phone=0375204558">LIÊN HỆ</a></li>
 </nav>
 

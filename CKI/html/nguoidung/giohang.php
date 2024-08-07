@@ -10,7 +10,11 @@ if (isset($_GET['id']) && !isset($_GET['action'])) {
     $soluong = 1;
     $taikhoan = $_SESSION['taikhoan'];
     // $thanhtien = $gia * $soluong;
-    $ngaythem = date("Y-m-d");
+    //Đặt múi giờ là 'Asia/Ho_Chi_Minh' cho Việt Nam
+    date_default_timezone_set('Asia/Ho_Chi_Minh');
+
+    //ngày hiện tại
+    $ngaythem = date('Y-m-d H:i:s');
 
     //lấy sp theo id trong bảng danhsachtruyen
     $sql_getproduct = "SELECT * FROM danhsachtruyen WHERE id = '$id'";
@@ -87,7 +91,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id']))
 }
 
 // Lấy thông tin giỏ hàng
-$taikhoan = $_SESSION['taikhoan'];
+$taikhoan = isset($_SESSION['taikhoan']) ? $_SESSION['taikhoan'] : '';
 $search = isset($_POST['search']) ? $_POST['search'] : '';
 
 // Lấy danh sách các truyện trong giỏ hàng với tìm kiếm
@@ -113,7 +117,7 @@ $totalAmount = 0;
     <link rel="stylesheet" href="/project/LTWEB/CKI/css/style.css">
     <link rel="stylesheet" href="/project/LTWEB/CKI/css/header.css">
     <link rel="stylesheet" href="/project/LTWEB/CKI/css/footer.css">
-
+    <link rel="icon" href="/project/LTWEB/CKI/img/logo/logo.jpg" type="image/jpg">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="/project/LTWEB/CKI/js/trangchu.js"></script>
     <script src="/project/LTWEB/CKI/js/header.js"></script>
@@ -159,6 +163,7 @@ $totalAmount = 0;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            margin-bottom: 2%;
         }
 
         thead tr {
@@ -245,6 +250,12 @@ $totalAmount = 0;
             <button type="submit">Tìm kiếm</button>
         </form>
     </div>
+    <ul>
+        <li>
+            <a href="/project/LTWEB/CKI/html/trangchu.php">Tiếp tục mua sắm</a> | <a
+                href="/project/LTWEB/CKI/html/danhmuc/buy.php">Thanh toán tất cả</a>
+        </li>
+    </ul>
     <form action="giohang.php" method="post" id="form_giohang">
         <table>
             <thead>
@@ -261,55 +272,58 @@ $totalAmount = 0;
             </thead>
             <tbody>
                 <?php
-                if (mysqli_num_rows($result) > 0) {
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        $id = $row["id"];
-                        $tentruyen = $row["tentruyen"];
-                        $taptruyen = $row["taptruyen"];
-                        $soluong = $row["soluong"];
-                        $gia = $row["gia"];
-                        $amount = $gia * $soluong;
-                        $totalAmount += $amount; // Cộng dồn thành tiền
+                if (!isset($_SESSION['taikhoan'])) {
+                    echo "<tr><td colspan='8'>Đăng nhập để xem giỏ hàng</td></tr>";
+                } else
+                    if (mysqli_num_rows($result) > 0) {
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            $id = $row["id"];
+                            $tentruyen = $row["tentruyen"];
+                            $taptruyen = $row["taptruyen"];
+                            $soluong = $row["soluong"];
+                            $gia = $row["gia"];
+                            $amount = $gia * $soluong;
+                            $totalAmount += $amount; // Cộng dồn thành tiền
                 
-                        // Lấy hình ảnh của truyện từ bảng danh sách truyện
-                        // $sql_image = "SELECT hinhanh FROM danhsachtruyen WHERE id = ?";
-                        // $stmt_image = mysqli_prepare($conn, $sql_image);
-                        // mysqli_stmt_bind_param($stmt_image, "s", $id);
-                        // mysqli_stmt_execute($stmt_image);
-                        // $result_image = mysqli_stmt_get_result($stmt_image);
-                        // $image_row = mysqli_fetch_assoc($result_image);
-                        // $hinhanh = $image_row ? $image_row['hinhanh'] : 'default_image.jpg';
+                            // Lấy hình ảnh của truyện từ bảng danh sách truyện
+                            // $sql_image = "SELECT hinhanh FROM danhsachtruyen WHERE id = ?";
+                            // $stmt_image = mysqli_prepare($conn, $sql_image);
+                            // mysqli_stmt_bind_param($stmt_image, "s", $id);
+                            // mysqli_stmt_execute($stmt_image);
+                            // $result_image = mysqli_stmt_get_result($stmt_image);
+                            // $image_row = mysqli_fetch_assoc($result_image);
+                            // $hinhanh = $image_row ? $image_row['hinhanh'] : 'default_image.jpg';
                 
-                        echo "<tr>";
-                        echo "<td><img src='/project/LTWEB/CKI/" . htmlspecialchars($row["hinhanh"]) . "' class='cart-image' alt='Hình ảnh truyện' /></td>";
-                        echo "<td style='width: 30%; text-align: center'>" . htmlspecialchars($tentruyen) . "</td>";
-                        echo "<td style='width: 30%; text-align: center'>" . htmlspecialchars($taptruyen) . "</td>";
-                        echo "<td style='text-align: center'><input style='text-align: center' type='number' name='soluong[" . htmlspecialchars($row["id"]) . "]' value='" . htmlspecialchars($soluong) . "' min='1' /></td>";
-                        echo "<td style='width: 10%; text-align: center'>" . number_format(htmlspecialchars($gia), 0, '', ',') . "đ</td>";
-                        echo "<td style='width: 10%; text-align: center'>" . number_format(htmlspecialchars($amount), 0, '', ',') . "đ</td>";
-                        echo "<td style='width: 20%; text-align: center'>" . htmlspecialchars($row["ngaythem"]) . "</td>";
+                            echo "<tr>";
+                            echo "<td><img src='/project/LTWEB/CKI/" . htmlspecialchars($row["hinhanh"]) . "' class='cart-image' alt='Hình ảnh truyện' /></td>";
+                            echo "<td style='width: 30%; text-align: center'>" . htmlspecialchars($tentruyen) . "</td>";
+                            echo "<td style='width: 30%; text-align: center'>" . htmlspecialchars($taptruyen) . "</td>";
+                            echo "<td style='text-align: center'><input style='text-align: center' type='number' name='soluong[" . htmlspecialchars($row["id"]) . "]' value='" . htmlspecialchars($soluong) . "' min='1' /></td>";
+                            echo "<td style='width: 10%; text-align: center'>" . number_format(htmlspecialchars($gia), 0, '', ',') . "đ</td>";
+                            echo "<td style='width: 10%; text-align: center'>" . number_format(htmlspecialchars($amount), 0, '', ',') . "đ</td>";
+                            echo "<td style='width: 20%; text-align: center'>" . htmlspecialchars($row["ngaythem"]) . "</td>";
 
-                        //nếu số lượng trong giỏ hàng lớn hơn số lượng tồn kho thì không thể mua và ngược lại
-                        $truyvan_sltk = "SELECT * FROM danhsachtruyen WHERE ten = '$tentruyen' AND taptruyen = '$taptruyen'";
-                        $thuchien_sltk = mysqli_query($conn, $truyvan_sltk);
+                            //nếu số lượng trong giỏ hàng lớn hơn số lượng tồn kho thì không thể mua và ngược lại
+                            $truyvan_sltk = "SELECT * FROM danhsachtruyen WHERE ten = '$tentruyen' AND taptruyen = '$taptruyen'";
+                            $thuchien_sltk = mysqli_query($conn, $truyvan_sltk);
 
-                        if ($thuchien_sltk) {
-                            $row_sltk = mysqli_fetch_array($thuchien_sltk);
-                            if ($row_sltk['soluongtonkho'] < $soluong) {
-                                if ($row_sltk['soluongtonkho'] > 0) {
-                                    echo "<td class='chucnang' style='text-align: center; text-wrap: nowrap'><a href='/project/LTWEB/CKI/html/danhmuc/chitietsanpham.php?id=$row_sltk[id]'>Chi tiết</a> | <a href='giohang.php?action=delete&id=" . htmlspecialchars($row["id"]) . "'>Xóa</a> | <a>Kho không đủ</a></td>";
+                            if ($thuchien_sltk) {
+                                $row_sltk = mysqli_fetch_array($thuchien_sltk);
+                                if ($row_sltk['soluongtonkho'] < $soluong) {
+                                    if ($row_sltk['soluongtonkho'] > 0) {
+                                        echo "<td class='chucnang' style='text-align: center; text-wrap: nowrap'><a href='/project/LTWEB/CKI/html/danhmuc/chitietsanpham.php?id=$row_sltk[id]'>Chi tiết</a> | <a href='giohang.php?action=delete&id=" . htmlspecialchars($row["id"]) . "'>Xóa</a> | <a>Kho không đủ</a></td>";
+                                    } else {
+                                        echo "<td class='chucnang' style='text-align: center; text-wrap: nowrap'><a href='/project/LTWEB/CKI/html/danhmuc/chitietsanpham.php?id=$row_sltk[id]'>Chi tiết</a> | <a href='giohang.php?action=delete&id=" . htmlspecialchars($row["id"]) . "'>Xóa</a> | <a>Đợi phát hành</a></td>";
+                                    }
                                 } else {
-                                    echo "<td class='chucnang' style='text-align: center; text-wrap: nowrap'><a href='/project/LTWEB/CKI/html/danhmuc/chitietsanpham.php?id=$row_sltk[id]'>Chi tiết</a> | <a href='giohang.php?action=delete&id=" . htmlspecialchars($row["id"]) . "'>Xóa</a> | <a>Đợi phát hành</a></td>";
+                                    echo "<td class='chucnang' style='text-align: center; text-wrap: nowrap'><a href='/project/LTWEB/CKI/html/danhmuc/chitietsanpham.php?id=$row_sltk[id]'>Chi tiết</a> | <a href='giohang.php?action=delete&id=" . htmlspecialchars($row["id"]) . "'>Xóa</a> | <a href='/project/LTWEB/CKI/html/danhmuc/buy.php?id=" . htmlspecialchars($row["id"]) . "'>Mua</a></td>";
                                 }
-                            } else {
-                                echo "<td class='chucnang' style='text-align: center; text-wrap: nowrap'><a href='/project/LTWEB/CKI/html/danhmuc/chitietsanpham.php?id=$row_sltk[id]'>Chi tiết</a> | <a href='giohang.php?action=delete&id=" . htmlspecialchars($row["id"]) . "'>Xóa</a> | <a href='/project/LTWEB/CKI/html/danhmuc/buy.php?id=" . htmlspecialchars($row["id"]) . "'>Mua</a></td>";
                             }
+                            echo "</tr>";
                         }
-                        echo "</tr>";
+                    } else {
+                        echo "<tr><td colspan='8'>Giỏ hàng trống</td></tr>";
                     }
-                } else {
-                    echo "<tr><td colspan='7'>Giỏ hàng trống</td></tr>";
-                }
                 ?>
             </tbody>
         </table>
@@ -318,14 +332,6 @@ $totalAmount = 0;
             <h3>Tổng thành tiền: <?php echo htmlspecialchars(number_format($totalAmount, 0, '', ',')); ?> VND</h3>
         </div>
     </form>
-    <ul>
-        <li>
-            <a href="trangchu.php">Tiếp tục mua sắm</a>
-        </li>
-        <li>
-            <a href="/project/LTWEB/CKI/html/danhmuc/buy.php">Thanh toán tất cả</a>
-        </li>
-    </ul>
 
     <?php mysqli_close($conn); ?>
 

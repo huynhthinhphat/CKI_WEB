@@ -19,9 +19,9 @@ header>div:first-child a {
 }
 
 header div:first-child img {
-    width: 60%;
-    height: 60%;
-    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 header>div:nth-child(2) {
@@ -116,11 +116,12 @@ header div:last-child li div:last-child div:first-child {
 }
 
 #taikhoan_xinchao span,
-.giohang span,.thongbao span {
+.giohang span,
+.thongbao span {
     font-weight: bold;
 }
 
-.thongbao{
+.thongbao {
     height: 100% !important;
     display: flex;
     justify-content: center !important;

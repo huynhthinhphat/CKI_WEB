@@ -86,11 +86,8 @@ document.addEventListener('DOMContentLoaded', function () {
         btn_themgiohang.forEach(function (item) {
             item.addEventListener('click', function () {
                 var productId = this.getAttribute("data-id-product");
-                var productName = this.getAttribute("data-ten-product");
-                var productChap = this.getAttribute("data-taptruyen-product");
-                window.location.href = "/project/LTWEB/CKI/html/nguoidung/giohang.php?id="+productId;
+                window.location.href = "/project/LTWEB/CKI/html/nguoidung/giohang.php?id=" + productId;
             });
         });
     }
-
 })

@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (res == "Không") {
                             $("#tbao_reg").html("Tài khoản hoặc mật khẩu đã tồn tại");
                         } else if(res == "ok") {
-                            window.location.href = '../html/trangchu.php'
+                            window.location.href = '../trangchu.php'
                         }else{
                             $("#tbao_reg").html(res);
                         }

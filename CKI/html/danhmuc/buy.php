@@ -1,16 +1,20 @@
 <?php
 session_start();
+
 $conn = mysqli_connect("localhost", "root", "", "webbansach");
 
-$truyvan_diachi = "SELECT * FROM taikhoan WHERE taikhoan = '$_SESSION[taikhoan]'";
-$thuchien_diachi = mysqli_query($conn, $truyvan_diachi);
+if (isset($_SESSION['taikhoan'])) {
 
-while ($row = mysqli_fetch_array($thuchien_diachi)) {
-    $_SESSION['diachi'] = $row['diachi'];
-    $_SESSION['tinh'] = $row['tinh'];
-    $_SESSION['huyen'] = $row['huyen'];
-    $_SESSION['xa'] = $row['xa'];
-    $_SESSION['sdt'] = $row['sdt'];
+    $truyvan_diachi = "SELECT * FROM taikhoan WHERE taikhoan = '$_SESSION[taikhoan]'";
+    $thuchien_diachi = mysqli_query($conn, $truyvan_diachi);
+
+    while ($row = mysqli_fetch_array($thuchien_diachi)) {
+        $_SESSION['diachi'] = $row['diachi'];
+        $_SESSION['tinh'] = $row['tinh'];
+        $_SESSION['huyen'] = $row['huyen'];
+        $_SESSION['xa'] = $row['xa'];
+        $_SESSION['sdt'] = $row['sdt'];
+    }
 }
 
 ?>
@@ -25,7 +29,8 @@ while ($row = mysqli_fetch_array($thuchien_diachi)) {
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <link rel="stylesheet" href="/project/LTWEB/CKI/css/buy.css">
-
+    <link rel="icon" href="/project/LTWEB/CKI/img/logo/logo.jpg" type="image/jpg">
+    
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 
@@ -46,13 +51,30 @@ while ($row = mysqli_fetch_array($thuchien_diachi)) {
                         </div>
                         <div class="name_logout">
                             <?php
-                            if ($_SESSION['email'] == "") {
-                                $_SESSION['email'] = "Chưa có email";
+                            if (isset($_SESSION['taikhoan'])) {
+                                if ($_SESSION['email'] == "") {
+                                    $_SESSION['email'] = "(Chưa có email)";
+                                }
+                            } else {
+                                $_SESSION['ho'] = "Tài khoản";
+                                $_SESSION['ten'] = "khách";
+                                $_SESSION['email'] = "";
+                                $_SESSION['sdt'] = "";
+                                $_SESSION['email'] = "";
+                                $_SESSION['diachi'] = "";
                             }
                             ?>
-                            <p><?php echo $_SESSION['ho'] . " " . $_SESSION['ten'] . " (" . $_SESSION['email'] . ")" ?>
+                            <p><?php echo $_SESSION['ho'] . " " . $_SESSION['ten'] . " " . $_SESSION['email'] . "" ?>
                             </p>
-                            <a href="/project/LTWEB/CKI/html/api.php?action=logout">Đăng xuất</a>
+                            <?php
+
+                            if (!isset($_SESSION['taikhoan'])) {
+                                echo "<a href='/project/LTWEB/CKI/html/login_reg/login_reg.php'>Đăng nhập</a>";
+                            } else {
+                                echo "<a href='/project/LTWEB/CKI/html/api.php?action=logout'>Đăng xuất</a>";
+                            }
+
+                            ?>
                         </div>
                     </div>
                 </div>
@@ -85,22 +107,17 @@ while ($row = mysqli_fetch_array($thuchien_diachi)) {
                     <div>
                         <label for="pay1">
                             <input type="radio" name="pay" id="pay1" value="Thanh toán khi nhận hàng"
-                                checked><span>Thanh toán
-                                khi nhận hàng</span>
+                                checked><span>Thanh toán khi nhận hàng</span>
                         </label>
-                        <label for="pay2">
+                        <!-- <label for="pay2">
                             <input type="radio" name="pay" id="pay2" value="Chuyển khoản qua ngân hàng"><span>Chuyển
                                 khoản qua ngân hàng</span>
-                        </label>
+                        </label> -->
                     </div>
                 </div>
                 <div>
                     <a href="/project/LTWEB/CKI/html/danhmuc/danhmuc.php">Tiếp tục mua sắm</a>
-                    <?php
-                    $truyvan = "SELECT * FROM giohang WHERE taikhoan = '$_SESSION[taikhoan]'";
-                    $thuchien = mysqli_query($conn, $truyvan);
-                    if (mysqli_num_rows($thuchien) > 0) {
-                        ?>
+                    <?php if (isset($_SESSION['taikhoan'])) { ?>
                         <button id="btn_pay" type="button">Thanh toán</button>
                     <?php } ?>
                 </div>
@@ -116,30 +133,49 @@ while ($row = mysqli_fetch_array($thuchien_diachi)) {
                 echo "<table style='width: 100%'>";
                 echo "<tbody>";
 
-                if (isset($_GET['id'])) {
-                    $truyvan = $truyvan . " WHERE id = '$_GET[id]' AND taikhoan = '$_SESSION[taikhoan]'";
+                if (!isset($_SESSION['taikhoan'])) {
+                    echo "<tr>";
+                    echo "<td colspan='8'>Đăng nhập để mua ngay</td>";
+                    echo "</tr>";
                 } else {
-                    $truyvan = $truyvan . " WHERE taikhoan = '$_SESSION[taikhoan]'";
-                }
-
-                $thuchien = mysqli_query($conn, $truyvan);
-
-                $tamtinh = 0;
-
-                if ($thuchien) {
-                    while ($row = mysqli_fetch_array($thuchien)) {
-                        echo "<tr>";
-                        echo "<td style='width:0%;'><img class='item_img_pay' src='/project/LTWEB/CKI/$row[hinhanh]'></td>";
-                        echo "<td style='width:50%; text-align: left; font-size: 2.5vh'>" . $row['tentruyen'] . " " . $row['taptruyen'] . "</td>";
-                        echo "<td style='width:5%; text-align: center; font-size: 2.5vh'>" . $row['soluong'] . "</td>";
-                        echo "<td style='width:20%; text-align: center; font-size: 2.5vh'>" . number_format($row['gia'], 0, '', ',') . "đ</td>";
-                        echo "<td style='width:25%%; text-align: center; font-size: 2.5vh'>" . number_format(($row['soluong'] * $row['gia']), 0, '', ',') . "đ</td>";
-                        echo "</tr>";
-
-                        $tamtinh += ($row['soluong'] * $row['gia']);
+                    if (isset($_GET['id'])) {
+                        $truyvan = $truyvan . " WHERE id = '$_GET[id]' AND taikhoan = '$_SESSION[taikhoan]'";
+                    } else {
+                        $truyvan = $truyvan . " WHERE taikhoan = '$_SESSION[taikhoan]'";
                     }
-                } else {
-                    echo " " . $conn->error;
+
+                    $thuchien = mysqli_query($conn, $truyvan);
+
+                    $tamtinh = 0;
+
+                    if ($thuchien) {
+                        while ($row = mysqli_fetch_array($thuchien)) {
+
+                            //chỉ lấy những sản phẩm có số lượng tồn kho > 0
+                            $truyvan_check = "SELECT * FROM danhsachtruyen WHERE ten = '$row[tentruyen]' AND taptruyen = '$row[taptruyen]'";
+                            $thuchien_check = mysqli_query($conn, $truyvan_check);
+
+                            if ($thuchien_check) {
+                                $row_check = mysqli_fetch_array($thuchien_check);
+                                if ($row_check['soluongtonkho'] > 0) {
+                                    echo "<tr>";
+                                    echo "<td style='width:0%;'><img class='item_img_pay' src='/project/LTWEB/CKI/$row[hinhanh]'></td>";
+                                    echo "<td style='width:50%; text-align: left; font-size: 2.5vh'>" . $row['tentruyen'] . " " . $row['taptruyen'] . "</td>";
+                                    echo "<td style='width:5%; text-align: center; font-size: 2.5vh'>" . $row['soluong'] . "</td>";
+                                    echo "<td style='width:20%; text-align: center; font-size: 2.5vh'>" . number_format($row['gia'], 0, '', ',') . "đ</td>";
+                                    echo "<td style='width:25%%; text-align: center; font-size: 2.5vh'>" . number_format(($row['soluong'] * $row['gia']), 0, '', ',') . "đ</td>";
+                                    echo "</tr>";
+
+                                    $tamtinh += $row['soluong'] * $row['gia'];
+                                }
+
+                            } else {
+                                echo " " . $conn->error;
+                            }
+                        }
+                    } else {
+                        echo " " . $conn->error;
+                    }
                 }
                 echo "</tbody>";
                 echo "</table>";
@@ -178,10 +214,8 @@ while ($row = mysqli_fetch_array($thuchien_diachi)) {
 <script>
     document.addEventListener('DOMContentLoaded', function () {
 
-        $("#phi_van_chuyen").html("__")
-        $("#tong_cong").html("__")
+        document.getElementById('tam_tinh').innerHTML = (<?php echo $tamtinh ?>).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
 
-        $("#tam_tinh").html((<?php echo $tamtinh ?>).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }))
         $.ajax({
             url: "https://raw.githubusercontent.com/kenzouno1/DiaGioiHanhChinhVN/master/data.json",
             method: "GET",
@@ -214,22 +248,21 @@ while ($row = mysqli_fetch_array($thuchien_diachi)) {
                             city.Districts.forEach(district => {
                                 districtsSelect.append(new Option(district.Name, district.Id));
                             });
+
+
+                            //tổng tiền ship
+                            if (city.Name == "Tỉnh Bình Định") {
+                                $("#phi_van_chuyen").html((15500).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
+                                $("#tong_cong").html((<?php echo $tamtinh ?> + 15500).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
+
+                                tongcong = <?php echo $tamtinh ?> + 15500;
+                            } else {
+                                $("#phi_van_chuyen").html((21000).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
+                                $("#tong_cong").html((<?php echo $tamtinh ?> + 21000).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
+
+                                tongcong = <?php echo $tamtinh ?> + 21000;
+                            }
                         }
-
-                        //tổng tiền ship
-                        if (city.Name == "Tỉnh Bình Định") {
-                            $("#phi_van_chuyen").html((15500).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
-                            $("#tong_cong").html((<?php echo $tamtinh ?> + 15500).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
-
-                            tongcong = <?php echo $tamtinh ?> + 15500;
-
-                        } else {
-                            $("#phi_van_chuyen").html((21000).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
-                            $("#tong_cong").html((<?php echo $tamtinh ?> + 21000).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
-
-                            tongcong = <?php echo $tamtinh ?> + 21000;
-                        }
-
                     });
                 })
 

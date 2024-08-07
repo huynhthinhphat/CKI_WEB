@@ -13,7 +13,7 @@ session_start();
     <link rel="stylesheet" href="/project/LTWEB/CKI/css/header.css">
     <link rel="stylesheet" href="/project/LTWEB/CKI/css/footer.css">
     <link rel="stylesheet" href="/project/LTWEB/CKI/css/spdoiduyet.css">
-
+    <link rel="icon" href="/project/LTWEB/CKI/img/logo/logo.jpg" type="image/jpg">
     <!-- js -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="/project/LTWEB/CKI/js/spdoiduyet.js"></script>

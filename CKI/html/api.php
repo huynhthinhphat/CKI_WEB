@@ -50,6 +50,17 @@ $radioValue = isset($_POST['radioValue']) ? $_POST['radioValue'] : '';
 $tongcong = isset($_POST['tongcong']) ? $_POST['tongcong'] : '';
 $id_thanhtoan = isset($_POST['id_thanhtoan']) ? $_POST['id_thanhtoan'] : '';
 
+//biến xác nhận
+$hdong = isset($_GET['hdong']) ? $_GET['hdong'] : '';
+$mahoadon = isset($_GET['mahoadon']) ? $_GET['mahoadon'] : '';
+
+//biến mã hóa đơn khi ng dùng hủy đơn
+$mahd_user = isset($_POST['mahd_user']) ? $_POST['mahd_user'] : '';
+
+//tên thể loại để thêm/xóa
+$tentheloai = isset($_POST['tentheloai']) ? $_POST['tentheloai'] : '';
+$hdong = isset($_POST['hdong']) ? $_POST['hdong'] : '';
+
 switch ($action) {
     case 'login':
         login($conn, $inputAcc, $inputPas);
@@ -93,6 +104,15 @@ switch ($action) {
     case 'thanhtoan':
         thanhtoan($conn, $id_thanhtoan, $selectedText_City, $selectedText_Districts, $selectedText_Ward, $diachicuthe, $sdt, $radioValue, $tongcong);
         break;
+    case 'xacnhan':
+        xacnhan($conn, $hdong, $mahoadon);
+        break;
+    case 'user_huydon':
+        user_huydon($conn, $mahd_user);
+        break;
+    case 'theloai':
+        theloai($conn, $tentheloai, $hdong);
+        break;
     default:
         echo "Yêu cầu không đúng";
         break;
@@ -100,6 +120,7 @@ switch ($action) {
 function logout($conn)
 {
     unset($_SESSION['taikhoan']);
+    session_destroy();
     header('Location: /project/LTWEB/CKI/html/trangchu.php');
 }
 
@@ -184,6 +205,8 @@ function reg($conn, $inputHo, $inputTen, $inputAcc, $inputPas)
                 $_SESSION['ten'] = $inputTen;
                 $_SESSION['loai'] = 1;
             }
+
+            echo "ok";
         }
     }
 }
@@ -194,7 +217,7 @@ function loadlistinweek($conn, $pageChoose_iw)
 
     //DATE_SUB(CURDATE(), INTERVAL 20 DAY): Hàm này trừ 20 ngày khỏi ngày hiện tại, tức là tính ngày cách đây 20 ngày từ hôm nay.
     //DATE_SUB - INTERVAL: trừ; DATE_ADD - INTERVAL: cộng  
-    $truyvan_start = "SELECT * FROM danhsachtruyen WHERE ngay >= DATE_SUB(CURDATE(), INTERVAL 20 DAY) ORDER BY ngay ASC";
+    $truyvan_start = "SELECT * FROM danhsachtruyen WHERE ngay >= DATE_SUB(CURDATE(), INTERVAL 14 DAY) ORDER BY ngay DESC";
 
     //tổng trang
     $total = mysqli_num_rows(mysqli_query($conn, $truyvan_start));
@@ -215,17 +238,25 @@ function loadlistinweek($conn, $pageChoose_iw)
                 $hinhanh = $row['hinhanh'];
                 $gia = number_format($row['gia'], 0, '', ',') . "<u>đ</u>";
 
-                echo "<div id-product='$row[id]' class='item_book'>";
+                echo "<div class='item_book'>";
                 echo "<div class='name_book'>";
-                echo "<p>$ten $taptruyen</p>";
+                echo "<a href='/project/LTWEB/CKI/html/danhmuc/chitietsanpham.php?id=" . $row['id'] . "'><p>$ten $taptruyen</p></a>";
                 echo "<p>$gia</p>";
                 echo "</div>";
                 echo "<div class='img_book'>";
                 echo "<img src='../$hinhanh'>";
                 echo "</div>";
-                echo "<div class='add_book'>";
-                echo "<button class='btn_themgiohang' data-ten-product='$ten' data-taptruyen-product='$taptruyen' data-id-product='$row[id]'>THÊM VÀO GIỎ</button>";
-                echo "</div>";
+                if (isset($_SESSION['taikhoan'])) {
+                    if ($_SESSION['loai'] != 0) {
+                        echo "<div class='add_book'>";
+                        echo "<button class='btn_themgiohang' data-id-product='$row[id]'>THÊM VÀO GIỎ</button>";
+                        echo "</div>";
+                    }
+                } else {
+                    echo "<div class='add_book'>";
+                    echo "<button class='btn_themgiohang' data-id-product='$row[id]'>THÊM VÀO GIỎ</button>";
+                    echo "</div>";
+                }
                 echo "</div>";
             }
 
@@ -295,17 +326,25 @@ function loadlistSPH($conn, $pageChoose_sph)
                 $hinhanh = $row['hinhanh'];
                 $gia = number_format($row['gia'], 0, '', ',') . "<u>đ</u>";
 
-                echo "<div id-product='$row[id]' class='item_book'>";
+                echo "<div class='item_book'>";
                 echo "<div class='name_book'>";
-                echo "<p>$ten $taptruyen</p>";
+                echo "<a href='/project/LTWEB/CKI/html/danhmuc/chitietsanpham.php?id=" . $row['id'] . "'><p>$ten $taptruyen</p></a>";
                 echo "<p>$gia</p>";
                 echo "</div>";
                 echo "<div class='img_book'>";
                 echo "<img src='../$hinhanh'>";
                 echo "</div>";
-                echo "<div class='add_book'>";
-                echo "<button class='btn_themgiohang' data-ten-product='$ten' data-taptruyen-product='$taptruyen' data-id-product='$row[id]'>THÊM VÀO GIỎ</button>";
-                echo "</div>";
+                if (isset($_SESSION['taikhoan'])) {
+                    if ($_SESSION['loai'] != 0) {
+                        echo "<div class='add_book'>";
+                        echo "<button class='btn_themgiohang' data-id-product='$row[id]'>THÊM VÀO GIỎ</button>";
+                        echo "</div>";
+                    }
+                } else {
+                    echo "<div class='add_book'>";
+                    echo "<button class='btn_themgiohang' data-id-product='$row[id]'>THÊM VÀO GIỎ</button>";
+                    echo "</div>";
+                }
                 echo "</div>";
             }
 
@@ -414,7 +453,7 @@ function listRevenu($conn, $input_search, $date_from, $date_to, $pageChoose)
 
         $start = ((int) $pageChoose - 1) * $max_show;
 
-        $truyvan = $truyvan . " LIMIT $start,$max_show";
+        $truyvan = $truyvan . " ORDER BY ngaymua DESC LIMIT $start,$max_show";
     }
 
     $thuchien = mysqli_query($conn, $truyvan);
@@ -433,7 +472,6 @@ function listRevenu($conn, $input_search, $date_from, $date_to, $pageChoose)
             echo "<table>";
             echo "<thead>";
             echo "<tr>";
-            echo "<th>STT</th>";
             echo "<th>Mã hóa đơn</th>";
             echo "<th>Tài khoản</th>";
             echo "<th>Thành tiền</th>";
@@ -448,13 +486,12 @@ function listRevenu($conn, $input_search, $date_from, $date_to, $pageChoose)
             while ($row = mysqli_fetch_array($thuchien)) {
                 $thanhtien = number_format($row['thanhtien'], 0, '', '.') . "vnd";
                 echo "<tr>";
-                echo "<td>" . $row['id'] . "</td>";
                 echo "<td>" . $row['mahoadon'] . "</td>";
                 echo "<td>" . $row['taikhoan'] . "</td>";
                 echo "<td>" . $thanhtien . "</td>";
                 echo "<td>" . $row['ngaymua'] . "</td>";
                 echo "<td>" . $row['phuongthucthanhtoan'] . "</td>";
-                echo "<td><a href='xemchitiet.php?mahoadon=".$row['mahoadon']."'>Xem chi tiết</a></td>";
+                echo "<td><a href='xemchitiet.php?mahoadon=" . $row['mahoadon'] . "'>Xem chi tiết</a></td>";
                 if ($row['trangthai'] == 1) {
                     echo "<td><i style='color: white; background-color: green; padding: 2% 2.5%; border-radius: 50%' class='fa-solid fa-check'></i></td>";
                 } else if ($row['trangthai'] == 2) {
@@ -651,6 +688,8 @@ function spdoiduyet($conn)
             echo "<td>" . $row['ngaymua'] . "</td>";
             echo "<td>Chờ duyệt</td>";
             echo "<td>
+            <a href='/project/LTWEB/CKI/html/doanhthu/xemchitiet.php?mahoadon=" . $row['mahoadon'] . "'><button>Xem chi tiết</button></a>
+            |
             <button class='btn_choduyet' data-mahd='$row[mahoadon]' taikhoan='$row[taikhoan]'>Duyệt</button>
             |
             <button class='btn_huydon' data-mahd='$row[mahoadon]' taikhoan='$row[taikhoan]'>Xóa</button>
@@ -668,8 +707,9 @@ function spdoiduyet($conn)
 
 function changeStatusProduct($conn, $idOfPro, $accOfPro, $pbiet)
 {
+    $dem = 1;
     if ($pbiet == "duyet") {
-        $truyvan = "UPDATE doanhthu SET trangthai = 1 WHERE mahoadon = '$idOfPro' AND taikhoan = '$accOfPro'";
+        $truyvan = "UPDATE doanhthu SET trangthai = 1, danhan = 1 WHERE mahoadon = '$idOfPro' AND taikhoan = '$accOfPro'";
         $thuchien = mysqli_query($conn, $truyvan);
 
         if ($thuchien) {
@@ -692,10 +732,17 @@ function changeStatusProduct($conn, $idOfPro, $accOfPro, $pbiet)
                                          SET soluongdaban = (soluongdaban + $row_select_flo_mahd[soluong]) 
                                          WHERE ten = '$row_select_flo_mahd[tentruyen]' AND taptruyen = '$row_select_flo_mahd[taptruyen]'";
                     $thuchien_tangsltk = mysqli_query($conn, $truyvan_tangsltk);
+
+                    if (!$thuchien_giamsltk || !$thuchien_tangsltk) {
+                        $dem++;
+                    }
+                }
+                if ($dem == 1) {
+                    echo "ok";
+                } else {
+                    echo "Lỗi";
                 }
             }
-
-            echo "ok";
         } else {
             echo " " . $conn->error;
         }
@@ -704,18 +751,6 @@ function changeStatusProduct($conn, $idOfPro, $accOfPro, $pbiet)
         $thuchien = mysqli_query($conn, $truyvan);
 
         if ($thuchien) {
-
-            $truyvan_get_pro_to_del = "SELECT * FROM chitiethoadon WHERE mahoadon = '$idOfPro' AND taikhoan = '$accOfPro'";
-            $thuchien_get_pro_to_dell = mysqli_query($conn, $truyvan_get_pro_to_del);
-
-            if ($thuchien_get_pro_to_dell) {
-                while ($row_get_pro_to_dell = mysqli_fetch_array($thuchien_get_pro_to_dell)) {
-                    //nếu hủy thì sẽ xóa các sp trong chitietgiohang
-                    $truyvan_del = "DELETE FROM chitiethoadon WHERE mahoadon = '$idOfPro'";
-                    $thuchien_del = mysqli_query($conn, $truyvan_del);
-                }
-            }
-
             echo "ok";
         } else {
             echo " " . $conn->error;
@@ -728,7 +763,7 @@ function buy($conn, $id_product)
     $truyvan = "SELECT * FROM danhsachtruyen WHERE id = $id_product";
     $thuchien = mysqli_query($conn, $truyvan);
 
-    if ($thuchien) {
+    if ($thuchien && isset($_SESSION['taikhoan'])) {
         if (mysqli_num_rows($thuchien) > 0) {
             while ($row = mysqli_fetch_array($thuchien)) {
 
@@ -780,7 +815,7 @@ function buy($conn, $id_product)
             echo " " . $conn->error;
         }
     } else {
-        echo "Không thể mua ngay";
+        header("Location: /project/LTWEB/CKI/html/danhmuc/buy.php");
     }
 }
 
@@ -806,7 +841,7 @@ function thanhtoan($conn, $id_thanhtoan, $selectedText_City, $selectedText_Distr
         $thuchien_select_max_idhd = mysqli_query($conn, $truyvan_select_max_idhd);
         if ($thuchien_select_max_idhd) {
 
-            $truyvan_insert = "INSERT INTO doanhthu(mahoadon, taikhoan, thanhtien, ngaymua, trangthai, phuongthucthanhtoan)";
+            $truyvan_insert = "INSERT INTO doanhthu(mahoadon, taikhoan, thanhtien, ngaymua, trangthai, danhan, phuongthucthanhtoan)";
 
             if (mysqli_num_rows($thuchien_select_max_idhd) > 0) {
                 while ($row_select_max_idhd = mysqli_fetch_array($thuchien_select_max_idhd)) {
@@ -814,11 +849,11 @@ function thanhtoan($conn, $id_thanhtoan, $selectedText_City, $selectedText_Distr
 
                     $mahd = "hd" . ($id_max + 1);
 
-                    $truyvan_insert = $truyvan_insert . " VALUES('$mahd','$_SESSION[taikhoan]', '$tongcong', '$now', 0, '$radioValue')";
+                    $truyvan_insert = $truyvan_insert . " VALUES('$mahd','$_SESSION[taikhoan]', '$tongcong', '$now', 0, 0, '$radioValue')";
                 }
             } else {
                 $mahd = "hd1";
-                $truyvan_insert = $truyvan_insert . " VALUES('$mahd','$_SESSION[taikhoan]', '$tongcong', '$now', 0, '$radioValue')";
+                $truyvan_insert = $truyvan_insert . " VALUES('$mahd','$_SESSION[taikhoan]', '$tongcong', '$now', 0, 0, '$radioValue')";
             }
 
             $thuchien_insert = mysqli_query($conn, $truyvan_insert);
@@ -842,30 +877,42 @@ function thanhtoan($conn, $id_thanhtoan, $selectedText_City, $selectedText_Distr
                 if ($thuchien_insert_product_chitiethd) {
                     while ($row_insert_product_chitiethd = mysqli_fetch_array($thuchien_insert_product_chitiethd)) {
 
-                        $tongtien = $row_insert_product_chitiethd['soluong'] * $row_insert_product_chitiethd['gia'];
+                        //chỉ lấy các sản phẩm có sluong tồn kho > 0
+                        $truyvan_check = "SELECT * FROM danhsachtruyen WHERE ten = '$row_insert_product_chitiethd[tentruyen]' AND taptruyen = '$row_insert_product_chitiethd[taptruyen]'";
+                        $thuchien_check = mysqli_query($conn, $truyvan_check);
 
-                        $truyvan_insert_chitiethoadon = "INSERT INTO chitiethoadon(mahoadon, taikhoan, tentruyen, taptruyen, soluong, gia, tongtien, ngay) 
-                                                             VALUES('$mahd','$_SESSION[taikhoan]','$row_insert_product_chitiethd[tentruyen]','$row_insert_product_chitiethd[taptruyen]','$row_insert_product_chitiethd[soluong]','$row_insert_product_chitiethd[gia]','$tongtien','$now')";
-                        $thuchien_insert_chitiethoadon = mysqli_query($conn, $truyvan_insert_chitiethoadon);
+                        if ($thuchien_check) {
+                            while ($row_check = mysqli_fetch_array($thuchien_check)) {
+                                if ($row_check['soluongtonkho'] > 0) {
 
-                        if ($thuchien_insert_chitiethoadon) {
+                                    //thêm sp vào trong chitiethoadon
+                                    $tongtien = $row_insert_product_chitiethd['soluong'] * $row_insert_product_chitiethd['gia'];
 
-                            //xóa khỏi giỏ hàng
-                            $truyvan_xoasp_gio = "DELETE FROM giohang";
-                            if ($id_thanhtoan) {
-                                $truyvan_xoasp_gio = $truyvan_xoasp_gio . " WHERE id = '$id_thanhtoan' AND tentruyen = '$row_insert_product_chitiethd[tentruyen]' AND taptruyen = '$row_insert_product_chitiethd[taptruyen]' AND taikhoan = '$_SESSION[taikhoan]'";
-                            } else {
-                                $truyvan_xoasp_gio = $truyvan_xoasp_gio . " WHERE tentruyen = '$row_insert_product_chitiethd[tentruyen]' AND taptruyen = '$row_insert_product_chitiethd[taptruyen]' AND taikhoan = '$_SESSION[taikhoan]'";
+                                    $truyvan_insert_chitiethoadon = "INSERT INTO chitiethoadon(mahoadon, taikhoan, tentruyen, taptruyen, soluong, gia, tongtien, ngay) 
+                                                                         VALUES('$mahd','$_SESSION[taikhoan]','$row_insert_product_chitiethd[tentruyen]','$row_insert_product_chitiethd[taptruyen]','$row_insert_product_chitiethd[soluong]','$row_insert_product_chitiethd[gia]','$tongtien','$now')";
+                                    $thuchien_insert_chitiethoadon = mysqli_query($conn, $truyvan_insert_chitiethoadon);
+
+                                    if ($thuchien_insert_chitiethoadon) {
+
+                                        //xóa khỏi giỏ hàng
+                                        $truyvan_xoasp_gio = "DELETE FROM giohang";
+                                        if ($id_thanhtoan) {
+                                            $truyvan_xoasp_gio = $truyvan_xoasp_gio . " WHERE id = '$id_thanhtoan' AND tentruyen = '$row_insert_product_chitiethd[tentruyen]' AND taptruyen = '$row_insert_product_chitiethd[taptruyen]' AND taikhoan = '$_SESSION[taikhoan]'";
+                                        } else {
+                                            $truyvan_xoasp_gio = $truyvan_xoasp_gio . " WHERE tentruyen = '$row_insert_product_chitiethd[tentruyen]' AND taptruyen = '$row_insert_product_chitiethd[taptruyen]' AND taikhoan = '$_SESSION[taikhoan]'";
+                                        }
+                                        $thuchien_xoasp_gio = mysqli_query($conn, $truyvan_xoasp_gio);
+
+                                        if ($thuchien_xoasp_gio) {
+                                            $tb = "1";
+                                        } else {
+                                            $tb = "2";
+                                        }
+                                    } else {
+                                        $tb = "2";
+                                    }
+                                }
                             }
-                            $thuchien_xoasp_gio = mysqli_query($conn, $truyvan_xoasp_gio);
-
-                            if ($thuchien_xoasp_gio) {
-                                $tb = "1";
-                            } else {
-                                $tb = "2";
-                            }
-                        } else {
-                            $tb = "2";
                         }
                     }
                 }
@@ -881,6 +928,66 @@ function thanhtoan($conn, $id_thanhtoan, $selectedText_City, $selectedText_Distr
         echo "Đặt hàng thành công. Đơn hàng của bạn đang được chuẩn bị!";
     } else {
         echo "Mua hàng thất bại!";
+    }
+}
+
+//xác nhận từ khách hàng
+function xacnhan($conn, $hdong, $mahoadon)
+{
+    $number = 0;
+    if ($hdong == "xacnhan") {
+        $number = 2;
+    } else {
+        $number = 3;
+    }
+    $update = "UPDATE doanhthu SET danhan = '$number' WHERE taikhoan = '$_SESSION[taikhoan]' AND mahoadon = '$mahoadon'";
+    $thuchien = mysqli_query($conn, $update);
+    if ($thuchien) {
+        header("Location: /project/LTWEB/CKI/html/nguoidung/lichsumuahang.php");
+    } else {
+        echo "Không thể xác nhận";
+    }
+}
+
+function user_huydon($conn, $mahd_user)
+{
+    $truyvan_xoa_chitiethoadon = "DELETE FROM chitiethoadon WHERE taikhoan = '$_SESSION[taikhoan]' AND mahoadon='$mahd_user'";
+    $thuchien_xoa_chitiethoadon = mysqli_query($conn, $truyvan_xoa_chitiethoadon);
+
+    if ($thuchien_xoa_chitiethoadon) {
+        $truyvan_xoa_doanhthu = "DELETE FROM doanhthu WHERE taikhoan = '$_SESSION[taikhoan]' AND mahoadon='$mahd_user'";
+        $thuchien_xoa_doanhthu = mysqli_query($conn, $truyvan_xoa_doanhthu);
+        if ($thuchien_xoa_doanhthu) {
+            echo "Hủy đơn thành công";
+        } else {
+            echo "Hủy đơn không thành công";
+        }
+    } else {
+        echo "Hủy đơn không thành công";
+    }
+}
+
+function theloai($conn, $tentheloai, $hdong)
+{
+    if ($hdong == "them") {
+        $truyvan = "INSERT INTO theloai(theloai) VALUES('$tentheloai')";
+    } else if ($hdong == "xoa") {
+        $truyvan = "DELETE FROM theloai WHERE theloai = '$tentheloai'";
+    }
+
+    $thuchien = mysqli_query($conn, $truyvan);
+    if ($thuchien) {
+        if ($hdong == "them") {
+            echo "Thêm thể loại mới thành công";
+        } else if ($hdong == "xoa") {
+            echo "Xóa thể loại thành công";
+        }
+    } else {
+        if ($hdong == "them") {
+            echo "Thêm thể loại mới thất bại";
+        } else if ($hdong == "xoa") {
+            echo "Xóa thể loại thất bại";
+        }
     }
 }
 

@@ -25,8 +25,8 @@
             <p>CHÍNH SÁCH CHUNG</p>
         </div>
         <div class="footer-policy" style="padding-top: 4%">
-            <li><a href=""><i class="fa-solid fa-angle-right"></i>Điều khoản sử dụng</a></li>
-            <li><a href=""><i class="fa-solid fa-angle-right"></i>Chính Sách Thanh Toán</a></li>
+            <li><a href="/project/LTWEB/CKI/html/dieukhoansudung.php"><i class="fa-solid fa-angle-right"></i>Điều khoản sử dụng</a></li>
+            <li><a href="/project/LTWEB/CKI/html/chinhsachquanly.php"><i class="fa-solid fa-angle-right"></i>Chính Sách Thanh Toán</a></li>
         </div>
     </div>
 </footer>

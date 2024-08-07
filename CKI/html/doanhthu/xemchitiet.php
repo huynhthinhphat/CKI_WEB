@@ -14,6 +14,9 @@ $mahoadon = isset($_GET['mahoadon']) ? $_GET['mahoadon'] : " ";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+
+    <link rel="icon" href="/project/LTWEB/CKI/img/logo/logo.jpg" type="image/jpg">
+
 </head>
 
 <style>
@@ -25,7 +28,7 @@ $mahoadon = isset($_GET['mahoadon']) ? $_GET['mahoadon'] : " ";
 
     #container_chitiethoadon {
         width: 100%;
-        height: 100%;
+        height: auto;
         display: flex;
         align-items: center;
         flex-direction: column;
@@ -45,7 +48,7 @@ $mahoadon = isset($_GET['mahoadon']) ? $_GET['mahoadon'] : " ";
 
     #container_chitiethoadon>div:last-child {
         display: flex;
-        justify-content: space-between;
+        justify-content: end;
     }
 
     table {
@@ -66,6 +69,10 @@ $mahoadon = isset($_GET['mahoadon']) ? $_GET['mahoadon'] : " ";
     td {
         padding: 1% 0;
     }
+
+    .diachidathang {
+        text-transform: capitalize;
+    }
 </style>
 
 <body>
@@ -73,6 +80,23 @@ $mahoadon = isset($_GET['mahoadon']) ? $_GET['mahoadon'] : " ";
         <div>
             <div class="title">
                 <h3>Chi tiết hóa đơn <?php echo $mahoadon ?></h3>
+            </div>
+            <div>
+                <?php
+                $truyvan_getAcc = "SELECT * FROM doanhthu WHERE mahoadon ='$mahoadon'";
+                $thuchien_getAcc = mysqli_query($conn, $truyvan_getAcc);
+
+                if ($thuchien_getAcc) {
+                    while ($row_getAcc = mysqli_fetch_array($thuchien_getAcc)) {
+                        $truyvan = "SELECT * FROM taikhoan WHERE taikhoan = '$row_getAcc[taikhoan]'";
+                        $thuchien = mysqli_query($conn, $truyvan);
+
+                        while ($row = mysqli_fetch_array($thuchien)) {
+                            echo "Địa chỉ đặt hàng: <span class='diachidathang'>" . $row['diachi'] . " - " . $row['xa'] . " - " . $row['huyen'] . " - " . $row['tinh'] . "</span>";
+                        }
+                    }
+                }
+                ?>
             </div>
             <table>
                 <thead>
@@ -103,12 +127,11 @@ $mahoadon = isset($_GET['mahoadon']) ? $_GET['mahoadon'] : " ";
                         </tbody>
                     <?php }
                 } else {
-                    echo "Không thêm xem chi tiết hóa đơn này";
+                    echo "Không thể xem chi tiết hóa đơn này";
                 } ?>
             </table>
         </div>
         <div>
-            <a href="doanhthu.php">Trở về</a>
             <?php
 
             $truyvan = "SELECT * FROM doanhthu WHERE mahoadon = '$mahoadon'";

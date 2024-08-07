@@ -3,6 +3,7 @@
 
 <head>
     <title>Sửa Truyện</title>
+    <link rel="icon" href="/project/LTWEB/CKI/img/logo/logo.jpg" type="image/jpg">
     <style>
         * {
             font-family: arial;
@@ -27,6 +28,7 @@
         form input[type="text"],
         form input[type="date"],
         form input[type="file"],
+        form input[type="number"],
         select {
             width: calc(100% - 22px);
             padding: 10px;
@@ -94,7 +96,7 @@
                 <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
                 Tên: <input type="text" name="ten" value="<?php echo $row['ten']; ?>"><br>
                 Tập truyện: <input type="text" name="taptruyen" value="<?php echo $row['taptruyen']; ?>"><br>
-                Hình ảnh: <input type="file" name="hinhanh"><br>
+                Hình ảnh: <input type="file" name="hinhanh" id="hinhanh"><br>
                 Thể loại:
                 <select name="theloai">
                     <?php
@@ -115,57 +117,15 @@
                         echo " " . $conn->error;
                     }
                     ?>
-                    <!-- <option value="Action" <?php if ($row['theloai'] == 'Action')
-                        echo 'selected'; ?>>Action</option>
-                    <option value="Arts" <?php if ($row['theloai'] == 'Arts')
-                        echo 'selected'; ?>>Arts</option>
-                    <option value="Cổ Đại" <?php if ($row['theloai'] == 'Cổ Đại')
-                        echo 'selected'; ?>>Cổ Đại</option>
-                    <option value="Hiện Đại" <?php if ($row['theloai'] == 'Hiện Đại')
-                        echo 'selected'; ?>>Hiện Đại</option>
-                    <option value="Historical" <?php if ($row['theloai'] == 'Historical')
-                        echo 'selected'; ?>>Historical</option>
-                    <option value="Horror" <?php if ($row['theloai'] == 'Horror')
-                        echo 'selected'; ?>>Horror</option>
-                    <option value="Huyền Nguyễn" <?php if ($row['theloai'] == 'Huyền Nguyễn')
-                        echo 'selected'; ?>>Huyền Nguyễn
-                    </option>
-                    <option value="Kiếm Hiệp" <?php if ($row['theloai'] == 'Kiếm Hiệp')
-                        echo 'selected'; ?>>Kiếm Hiệp</option>
-                    <option value="Quân Sự" <?php if ($row['theloai'] == 'Quân Sự')
-                        echo 'selected'; ?>>Quân Sự</option>
-                    <option value="Romance" <?php if ($row['theloai'] == 'Romance')
-                        echo 'selected'; ?>>Romance</option>
-                    <option value="School Life" <?php if ($row['theloai'] == 'School Life')
-                        echo 'selected'; ?>>School Life
-                    </option>
-                    <option value="Truyện Teen" <?php if ($row['theloai'] == 'Truyện Teen')
-                        echo 'selected'; ?>>Truyện Teen
-                    </option>
-                    <option value="Xuyên Không" <?php if ($row['theloai'] == 'Xuyên Không')
-                        echo 'selected'; ?>>Xuyên Không
-                    </option>
-                    <option value="Comedy" <?php if ($row['theloai'] == 'Comedy')
-                        echo 'selected'; ?>>Comedy</option>
-                    <option value="Manga" <?php if ($row['theloai'] == 'Manga')
-                        echo 'selected'; ?>>Manga</option>
-                    <option value="Manhua" <?php if ($row['theloai'] == 'Manhua')
-                        echo 'selected'; ?>>Manhua</option>
-                    <option value="Manhwa" <?php if ($row['theloai'] == 'Manhwa')
-                        echo 'selected'; ?>>Manhwa</option>
-                    <option value="Hài Hước" <?php if ($row['theloai'] == 'Hài Hước')
-                        echo 'selected'; ?>>Hài Hước</option>
-                    <option value="One Shot" <?php if ($row['theloai'] == 'One Shot')
-                        echo 'selected'; ?>>One Shot</option>
-                    <option value="Phiêu lưu" <?php if ($row['theloai'] == 'Phiêu lưu')
-                        echo 'selected'; ?>>Phiêu lưu</option>
-                    <option value="Truyện Màu" <?php if ($row['theloai'] == 'Truyện Màu')
-                        echo 'selected'; ?>>Truyện Màu</option> -->
                 </select><br>
                 Giá: <input type="text" name="gia" value="<?php echo $row['gia']; ?>"><br>
-                <!-- Ngày: <input type="date" name="ngay" value="<?php echo $row['ngay']; ?>"><br> -->
-                Số lượng tồn kho: <input type="text" name="soluongtonkho" value="<?php echo $row['soluongtonkho']; ?>"><br>
-                Số lượng đã bán: <input type="text" name="soluongdaban" value="<?php echo $row['soluongdaban']; ?>" disabled><br>
+                Số lượng tồn kho: <input type="number" name="soluongtonkho" value="<?php echo $row['soluongtonkho']; ?>"><br>
+                Tên tác giả: <input type="text" name="tentacgia" value="<?php echo $row['tentacgia']; ?>"><br>
+                Dịch giả: <input type="text" name="dichgia" value="<?php echo $row['dichgia']; ?>"><br>
+                Họa sĩ: <input type="text" name="hoasi" value="<?php echo $row['hoasi']; ?>"><br>
+                Xuất xứ: <input type="text" name="xuatxu" value="<?php echo $row['xuatsu']; ?>"><br>
+                Series: <input type="text" name="series" value="<?php echo $row['series']; ?>"><br>
+                Mô tả: <input type="text" name="mota" value="<?php echo $row['mota']; ?>"><br>
                 <input type="submit" name="sua" value="Sửa Truyện">
             </form>
 
@@ -174,35 +134,105 @@
             echo "Không tìm thấy truyện.";
         }
     } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['sua'])) {
-        $id = $_POST['id'];
+        $id_sua = $_POST['id'];
         $ten = $_POST['ten'];
         $taptruyen = $_POST['taptruyen'];
         $theloai = $_POST['theloai'];
         $gia = $_POST['gia'];
-        $ngay = $_POST['ngay'];
         $soluongtonkho = $_POST['soluongtonkho'];
-        $soluongdaban = $_POST['soluongdaban'];
+        $tentacgia = $_POST['tentacgia'];
+        $dichgia = $_POST['dichgia'];
+        $hoasi = $_POST['hoasi'];
+        $xuatxu = $_POST['xuatxu'];
+        $series = $_POST['series'];
+        $mota = $_POST['mota'];
+        $hinhanh = basename($_FILES["hinhanh"]["name"]);
 
-        $target_dir = "img/truyen/";
-        $target_file = $target_dir . basename($_FILES["hinhanh"]["name"]);
-        move_uploaded_file($_FILES["hinhanh"]["tmp_name"], $target_file);
-
-        $sql = "UPDATE danhsachtruyen
-            SET ten='$ten', taptruyen='$taptruyen', hinhanh='$target_file', theloai='$theloai', gia='$gia', ngay='$ngay', soluongtonkho='$soluongtonkho', soluongdaban='$soluongdaban'
-            WHERE id='$id'";
+        if (!$hinhanh) {
+            $sql = "UPDATE danhsachtruyen
+            SET ten='$ten', 
+                taptruyen='$taptruyen', 
+                theloai='$theloai', 
+                gia='$gia', 
+                soluongtonkho='$soluongtonkho', 
+                tentacgia = '$tentacgia', 
+                dichgia = '$dichgia',
+                hoasi = '$hoasi',
+                xuatsu = '$xuatxu',
+                series = '$series',
+                mota = '$mota'
+            WHERE id = '$id_sua'";
+        } else {
+            $sql = "UPDATE danhsachtruyen
+            SET ten='$ten', 
+                taptruyen='$taptruyen', 
+                theloai='$theloai', 
+                gia='$gia', 
+                hinhanh='img/truyen/$hinhanh', 
+                soluongtonkho='$soluongtonkho', 
+                tentacgia = '$tentacgia', 
+                dichgia = '$dichgia',
+                hoasi = '$hoasi',
+                xuatsu = '$xuatxu',
+                series = '$series',
+                mota = '$mota'
+            WHERE id = '$id_sua'";
+        }
 
         if ($conn->query($sql) === TRUE) {
-            echo "Truyện được cập nhật thành công!";
+            if ($hinhanh) {
+                // Đường dẫn tuyệt đối trên hệ thống tệp
+                $target_dir = "D:/xampp/htdocs/project/LTWEB/CKI/img/truyen/";
+                $target_file = $target_dir . $hinhanh;
+
+                if (move_uploaded_file($_FILES["hinhanh"]["tmp_name"], $target_file)) {
+                    header("Location: QLSP.php?tbao=sua_ok");
+                } else {
+                    header("Location: QLSP.php?tbao=sua_ko");
+                }
+            } else {
+                header("Location: QLSP.php?tbao=sua_ok");
+            }
         } else {
-            echo "Lỗi: " . $sql . "<br>" . $conn->error;
+            header("Location: QLSP.php?tbao=sua_ko");
         }
 
         $conn->close();
-        header("Location: QLSP.php");
         exit();
     }
     ?>
 
 </body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var hinhanh = document.getElementById('hinhanh');
+
+        hinhanh.addEventListener('input', function () {
+            var file = this.files[0];
+
+            //1MB = 1024 KB, 1KB = 1024 byte
+            //1024: số byte  trong một kilobyte
+            //1024 x 1024: số byte trong một megabyte
+            var maxSize = 5 * 1024 * 1024; // 5MB
+
+            var allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp'];
+
+            //file.type là thuộc tính của đối tượng File đại diện cho loại MIME của tệp. 
+            //Loại MIME (Multipurpose Internet Mail Extensions) là một tiêu chuẩn để mô tả kiểu dữ liệu của tệp.
+            if (file) {
+                if (!allowedTypes.includes(file.type)) {
+                    confirm("Hãy chọn file hình ảnh");
+                    this.value = '';
+                } else {
+                    if (file && file.size > maxSize) {
+                        confirm("File phải nhỏ hơn 5MB");
+                        this.value = '';
+                    }
+                }
+            }
+        })
+    })
+</script>
 
 </html>

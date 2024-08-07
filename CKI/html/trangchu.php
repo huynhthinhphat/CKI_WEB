@@ -8,6 +8,8 @@ session_start();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trang chủ</title>
 
+    <link rel="icon" href="/project/LTWEB/CKI/img/logo/logo.jpg" type="image/jpg">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <link rel="stylesheet" href="/project/LTWEB/CKI/css/style.css">
     <link rel="stylesheet" href="/project/LTWEB/CKI/css/header.css">
@@ -18,7 +20,6 @@ session_start();
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="/project/LTWEB/CKI/js/trangchu.js"></script>
     <script src="/project/LTWEB/CKI/js/header.js"></script>
-    <!-- <script src="/project/LTWEB/CKI/js/add_book.js"></script> -->
 
 </head>
 

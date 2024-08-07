@@ -14,6 +14,8 @@ session_start();
     <link rel="stylesheet" href="/project/LTWEB/CKI/css/footer.css">
     <link rel="stylesheet" href="/project/LTWEB/CKI/css/doanhthu.css">
 
+    <link rel="icon" href="/project/LTWEB/CKI/img/logo/logo.jpg" type="image/jpg">
+
     <!-- js -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>

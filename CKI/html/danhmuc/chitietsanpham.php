@@ -14,6 +14,13 @@ session_start();
     <link rel="stylesheet" href="/project/LTWEB/CKI/css/header.css">
     <link rel="stylesheet" href="/project/LTWEB/CKI/css/footer.css">
 
+    <link rel="icon" href="/project/LTWEB/CKI/img/logo/logo.jpg" type="image/jpg">
+
+    <!-- js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/project/LTWEB/CKI/js/trangchu.js"></script>
+    <script src="/project/LTWEB/CKI/js/header.js"></script>
+
     <style>
         .product-wrapper {
             font-family: Arial, sans-serif;
@@ -232,11 +239,11 @@ session_start();
                     echo '<h1>' . htmlspecialchars($row['ten']) . ' - ' . htmlspecialchars($row["taptruyen"]) . '</h1>';
                     echo '<div style="display: flex; align-items: center;">';
                     echo '<p class="price">' . number_format($row['gia'], 0, ',', '.') . 'đ</p>';
-                    echo '<div class="quantity">';
-                    echo '<button onclick="decreaseQuantity()">-</button>';
-                    echo '<input type="number" value="1" min="1" max="' . htmlspecialchars($row['soluongtonkho']) . '">';
-                    echo '<button onclick="increaseQuantity()">+</button>';
-                    echo '</div>';
+                    // echo '<div class="quantity">';
+                    // echo '<button onclick="decreaseQuantity()">-</button>';
+                    // echo '<input type="number" value="1" min="1" max="' . htmlspecialchars($row['soluongtonkho']) . '">';
+                    // echo '<button onclick="increaseQuantity()">+</button>';
+                    // echo '</div>';
                     echo '</div>';
                     echo '<div class="details-grid">';
                     echo '<p class="p"><strong>Thể loại:</strong> ' . htmlspecialchars($row['theloai']) . '</p>';
@@ -255,8 +262,15 @@ session_start();
                     $add_to_cart_button_class = $row["soluongtonkho"] <= 0 ? 'btn disabled add-to-cart' : 'btn add-to-cart';
 
                     echo '<div class="btn-container">';
-                    echo '<a href="#" class="' . $add_to_cart_button_class . '"' . $buy_button_disabled . '>Thêm vào giỏ</a>';
-                    echo '<a href="#" class="' . $buy_button_class . '"' . $buy_button_disabled . '>Mua ngay</a>';
+                    if (isset($_SESSION['taikhoan'])) {
+                        if ($_SESSION['loai'] != 0) {
+                            echo '<a href="/project/LTWEB/CKI/html/nguoidung/giohang.php?id=' . $row['id'] . '" class="' . $add_to_cart_button_class . '"' . $buy_button_disabled . '>Thêm vào giỏ</a>';
+                            echo '<a href="/project/LTWEB/CKI/html/api.php?action=buy&id=' . $row['id'] . '" class="' . $buy_button_class . '"' . $buy_button_disabled . '>Mua ngay</a>';
+                        }
+                    } else {
+                        echo '<a href="/project/LTWEB/CKI/html/nguoidung/giohang.php?id=' . $row['id'] . '" class="' . $add_to_cart_button_class . '"' . $buy_button_disabled . '>Thêm vào giỏ</a>';
+                        echo '<a href="/project/LTWEB/CKI/html/api.php?action=buy&id=' . $row['id'] . '" class="' . $buy_button_class . '"' . $buy_button_disabled . '>Mua ngay</a>';
+                    }
                     echo '</div>';
                     echo '</div>';
                     echo '</div>';
@@ -269,10 +283,10 @@ session_start();
             </div>
         </div>
     </div>
-    
+
     <?php include ("../form/footer.php"); ?>
 
-    <script>
+    <!-- <script>
         function decreaseQuantity() {
             let quantityInput = document.querySelector('.quantity input');
             if (quantityInput.value > 1) {
@@ -284,7 +298,7 @@ session_start();
             let quantityInput = document.querySelector('.quantity input');
             quantityInput.value++;
         }
-    </script>
+    </script> -->
 
 </body>
 
